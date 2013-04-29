@@ -3,9 +3,30 @@ require 'spec_helper'
 describe Permissioner::PermissionServiceAdditions do
 
   before :each do
-    permission_service_class = Class.new
-    permission_service_class.send(:include, Permissioner::PermissionServiceAdditions)
-    @permission_service = permission_service_class.new
+    @permission_service_class = Class.new
+    @permission_service_class.send(:include, Permissioner::PermissionServiceAdditions)
+    @permission_service = @permission_service_class.new
+  end
+
+  describe '::included' do
+
+    it 'should extend class with module Permissioner::PermissionServiceAdditions::ClassMethods' do
+      clazz = Class.new
+      clazz.should_receive(:extend).with(Permissioner::PermissionServiceAdditions::ClassMethods)
+      clazz.send(:include, Permissioner::PermissionServiceAdditions)
+    end
+  end
+
+  describe '::create' do
+
+    before :each do
+      @permission_service_class.any_instance.stub(:configure_permissions)
+    end
+
+    it 'should return permission_service instance' do
+      permission_service = @permission_service_class.create(nil)
+      permission_service.singleton_class.included_modules.should include(Permissioner::PermissionServiceAdditions)
+    end
   end
 
   describe '#allow_action?' do
@@ -62,6 +83,36 @@ describe Permissioner::PermissionServiceAdditions do
         @permission_service.allow_actions :comments, :index, &block
         @permission_service.allow_action?(:comments, :index).should be_false
       end
+    end
+  end
+
+  describe '#execute_filters' do
+
+    it 'should return true when all blocks for given controller and action returns true' do
+      @permission_service.add_filter(:comments, :create, &Proc.new { true })
+      @permission_service.execute_filters(:comments, :create, 'params').should be_true
+    end
+
+    it 'should return true when no filters are added at all' do
+      @permission_service.execute_filters(:comments, :create, 'params').should be_true
+    end
+
+    it 'should return true when for given controller and action no filters has been added' do
+      @permission_service.add_filter(:comments, :update, &Proc.new {})
+      @permission_service.execute_filters(:comments, :create, 'params').should be_true
+    end
+
+    it 'should return false when at least one block for given controller and action returns false' do
+      @permission_service.add_filter(:comments, :create, &Proc.new { true })
+      @permission_service.add_filter(:comments, :create, &Proc.new { false })
+      @permission_service.add_filter(:comments, :create, &Proc.new { true })
+      @permission_service.execute_filters(:comments, :create, 'params').should be_false
+    end
+
+    it 'should pass params to the given block' do
+      params = Object.new
+      @permission_service.add_filter(:comments, :create, &Proc.new { |p| p.object_id.should eq params.object_id })
+      @permission_service.execute_filters(:comments, :create, params)
     end
   end
 
@@ -152,6 +203,41 @@ describe Permissioner::PermissionServiceAdditions do
       allowed_params.count.should eq 2
       allowed_params[:comment].should eq [:user, :text]
       allowed_params[:post].should eq [:user, :text]
+    end
+  end
+
+  describe '#add_filter' do
+
+    it 'should add given block to @filters addressed by controller and action' do
+      block = Proc.new {}
+      @permission_service.add_filter(:comments, :create, &block)
+      filter_list = @permission_service.instance_variable_get(:@filters)[['comments', 'create']]
+      filter_list.count.should eq 1
+      filter_list.should include block
+    end
+
+    it 'should add given block to @filters addressed by controller and action when multiple given' do
+      block = Proc.new {}
+      @permission_service.add_filter([:comments, :posts], [:create, :update], &block)
+      @permission_service.instance_variable_get(:@filters)[['comments', 'create']].should include block
+      @permission_service.instance_variable_get(:@filters)[['comments', 'update']].should include block
+      @permission_service.instance_variable_get(:@filters)[['posts', 'create']].should include block
+      @permission_service.instance_variable_get(:@filters)[['posts', 'update']].should include block
+    end
+
+    it 'should add multiple blocks to @filters addressed by controller and action' do
+      block_1 = Proc.new { 'block 1' }
+      block_2 = Proc.new { 'block 2' }
+      @permission_service.add_filter(:comments, :create, &block_1)
+      @permission_service.add_filter(:comments, :create, &block_2)
+      filter_list = @permission_service.instance_variable_get(:@filters)[['comments', 'create']]
+      filter_list.count.should eq 2
+      filter_list.should include block_1
+      filter_list.should include block_2
+    end
+
+    it 'should rails exception when no block given' do
+      expect { @permission_service.add_filter(:comments, :index) }.to raise_error('no block given')
     end
   end
 end
