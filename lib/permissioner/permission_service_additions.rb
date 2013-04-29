@@ -8,11 +8,7 @@ module Permissioner
     end
 
     def allow_param?(resource, attribute)
-      if @allow_all
-        true
-      elsif @allowed_params && @allowed_params[resource]
-        @allowed_params[resource].include?(attribute)
-      end
+      @allow_all || @allowed_params && @allowed_params[resource].try(:include?, attribute)
     end
 
     def permit_params!(params)

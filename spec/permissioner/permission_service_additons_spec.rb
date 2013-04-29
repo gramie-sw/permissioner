@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'Permissioner::PermissionServiceAdditions' do
+describe Permissioner::PermissionServiceAdditions do
 
   before :each do
     permission_service_class = Class.new
@@ -84,10 +84,20 @@ describe 'Permissioner::PermissionServiceAdditions' do
 
   describe '#permit_params!' do
 
-    it 'call permit! on given params when @allow_all is true' do
+    it 'should call permit! on given params when @allow_all is true' do
       params = double('params')
       params.should_receive(:permit!)
       @permission_service.allow_all
+      @permission_service.permit_params!(params)
+    end
+
+    it 'should call permit on allowed params' do
+      params = {comment: {user_id: '12', text: 'text', date: 'date'}, post: {title: 'title', content: 'content'}}
+      @permission_service.allow_params(:comment, [:user_id, :text])
+      @permission_service.allow_params(:post, [:title, :content])
+      params[:comment].should_receive(:respond_to?).with(:permit).and_return(true)
+      params[:comment].should_receive(:permit).with(:user_id, :text)
+      params[:post].should_receive(:permit).with(:title, :content)
       @permission_service.permit_params!(params)
     end
   end

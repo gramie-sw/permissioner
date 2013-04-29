@@ -16,4 +16,5 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
 
   gem.add_development_dependency "rspec"
+  gem.add_development_dependency 'activesupport', '~> 3.2.11'
 end
