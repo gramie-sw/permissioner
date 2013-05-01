@@ -25,7 +25,17 @@ describe Permissioner::PermissionServiceAdditions do
 
     it 'should return permission_service instance' do
       permission_service = @permission_service_class.create(nil)
-      permission_service.singleton_class.included_modules.should include(Permissioner::PermissionServiceAdditions)
+      permission_service.class.included_modules.should include(Permissioner::PermissionServiceAdditions)
+    end
+
+    it 'should set current_user' do
+      @permission_service_class.any_instance.should_receive(:current_user=).with('current_user')
+      @permission_service_class.create('current_user')
+    end
+
+    it 'should call configure_permissions current_user' do
+      @permission_service_class.any_instance.should_receive(:configure_permissions)
+      @permission_service_class.create(nil)
     end
   end
 
