@@ -51,7 +51,7 @@ module Permissioner
     end
 
     # Should be overwritten by the including class and is called during initialization in ::create.
-    # This the place where permissions should be configured.
+    # This the intended place where permissions should be configured.
     #
     def configure_permissions
     end
