@@ -10,7 +10,7 @@ describe Permissioner::PermissionServiceAdditions do
 
   describe '::included' do
 
-    it 'should extend class with module Permissioner::PermissionServiceAdditions::ClassMethods' do
+    it 'should extend including class with module Permissioner::PermissionServiceAdditions::ClassMethods' do
       clazz = Class.new
       clazz.should_receive(:extend).with(Permissioner::PermissionServiceAdditions::ClassMethods)
       clazz.send(:include, Permissioner::PermissionServiceAdditions)
