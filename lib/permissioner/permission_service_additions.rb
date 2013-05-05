@@ -26,7 +26,7 @@ module Permissioner
       @allow_all || @allowed_params && @allowed_params[resource].try(:include?, attribute)
     end
 
-    def execute_filters(controller, action, params)
+    def passed_filters?(controller, action, params)
       if @filters && @filters[[controller.to_s, action.to_s]]
         @filters[[controller.to_s, action.to_s]].all? { |block| block.call(params) }
       else

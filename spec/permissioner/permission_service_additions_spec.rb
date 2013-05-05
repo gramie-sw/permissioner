@@ -96,33 +96,33 @@ describe Permissioner::PermissionServiceAdditions do
     end
   end
 
-  describe '#execute_filters' do
+  describe '#passed_filters?' do
 
     it 'should return true when all blocks for given controller and action returns true' do
       @permission_service.add_filter(:comments, :create, &Proc.new { true })
-      @permission_service.execute_filters(:comments, :create, 'params').should be_true
+      @permission_service.passed_filters?(:comments, :create, 'params').should be_true
     end
 
     it 'should return true when no filters are added at all' do
-      @permission_service.execute_filters(:comments, :create, 'params').should be_true
+      @permission_service.passed_filters?(:comments, :create, 'params').should be_true
     end
 
     it 'should return true when for given controller and action no filters has been added' do
       @permission_service.add_filter(:comments, :update, &Proc.new {})
-      @permission_service.execute_filters(:comments, :create, 'params').should be_true
+      @permission_service.passed_filters?(:comments, :create, 'params').should be_true
     end
 
     it 'should return false when at least one block for given controller and action returns false' do
       @permission_service.add_filter(:comments, :create, &Proc.new { true })
       @permission_service.add_filter(:comments, :create, &Proc.new { false })
       @permission_service.add_filter(:comments, :create, &Proc.new { true })
-      @permission_service.execute_filters(:comments, :create, 'params').should be_false
+      @permission_service.passed_filters?(:comments, :create, 'params').should be_false
     end
 
     it 'should pass params to the given block' do
       params = Object.new
       @permission_service.add_filter(:comments, :create, &Proc.new { |p| p.object_id.should eq params.object_id })
-      @permission_service.execute_filters(:comments, :create, params)
+      @permission_service.passed_filters?(:comments, :create, params)
     end
   end
 
