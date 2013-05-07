@@ -126,20 +126,20 @@ describe Permissioner::PermissionServiceAdditions do
     end
   end
 
-  describe '#allow_params?' do
+  describe '#allow_attributes?' do
 
     it 'should return true when @allow_all is true' do
       @permission_service.allow_all
-      @permission_service.allow_param?(:comment, :user_id).should be_true
+      @permission_service.allow_attribute?(:comment, :user_id).should be_true
     end
 
     it 'should return true when param is allowed' do
-      @permission_service.allow_params(:comment, :user_id)
-      @permission_service.allow_param?(:comment, :user_id).should be_true
+      @permission_service.allow_attributes(:comment, :user_id)
+      @permission_service.allow_attribute?(:comment, :user_id).should be_true
     end
 
     it 'should return false when param not allowed' do
-      @permission_service.allow_param?(:comment, :user_id).should be_false
+      @permission_service.allow_attribute?(:comment, :user_id).should be_false
     end
   end
 
@@ -154,8 +154,8 @@ describe Permissioner::PermissionServiceAdditions do
 
     it 'should call permit on allowed params' do
       params = {comment: {user_id: '12', text: 'text', date: 'date'}, post: {title: 'title', content: 'content'}}
-      @permission_service.allow_params(:comment, [:user_id, :text])
-      @permission_service.allow_params(:post, [:title, :content])
+      @permission_service.allow_attributes(:comment, [:user_id, :text])
+      @permission_service.allow_attributes(:post, [:title, :content])
       params[:comment].should_receive(:respond_to?).with(:permit).and_return(true)
       params[:comment].should_receive(:permit).with(:user_id, :text)
       params[:post].should_receive(:permit).with(:title, :content)
@@ -198,18 +198,18 @@ describe Permissioner::PermissionServiceAdditions do
     end
   end
 
-  describe '#allow_params' do
+  describe '#allow_attributes' do
 
     it 'should add resource and attribute to @allowed_params' do
-      @permission_service.allow_params :comment, :text
-      allowed_params = @permission_service.instance_variable_get(:@allowed_params)
+      @permission_service.allow_attributes :comment, :text
+      allowed_params = @permission_service.instance_variable_get(:@allowed_attributes)
       allowed_params.count.should eq 1
       allowed_params[:comment].should eq [:text]
     end
 
     it 'should add resource and attribute to @allowed_params if multiple given' do
-      @permission_service.allow_params [:comment, :post], [:user, :text]
-      allowed_params = @permission_service.instance_variable_get(:@allowed_params)
+      @permission_service.allow_attributes [:comment, :post], [:user, :text]
+      allowed_params = @permission_service.instance_variable_get(:@allowed_attributes)
       allowed_params.count.should eq 2
       allowed_params[:comment].should eq [:user, :text]
       allowed_params[:post].should eq [:user, :text]

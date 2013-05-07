@@ -22,8 +22,8 @@ module Permissioner
       allowed && (allowed == true || resource && allowed.call(resource))
     end
 
-    def allow_param?(resource, attribute)
-      @allow_all || @allowed_params && @allowed_params[resource].try(:include?, attribute)
+    def allow_attribute?(resource, attribute)
+      @allow_all || @allowed_attributes && @allowed_attributes[resource].try(:include?, attribute)
     end
 
     def passed_filters?(controller, action, params)
@@ -37,8 +37,8 @@ module Permissioner
     def permit_params!(params)
       if @allow_all
         params.permit!
-      elsif @allowed_params
-        @allowed_params.each do |resource, attributes|
+      elsif @allowed_attributes
+        @allowed_attributes.each do |resource, attributes|
           if params[resource].respond_to? :permit
             params[resource] = params[resource].permit(*attributes)
           end
@@ -70,11 +70,11 @@ module Permissioner
       end
     end
 
-    def allow_params(resources, attributes)
-      @allowed_params ||= {}
+    def allow_attributes(resources, attributes)
+      @allowed_attributes ||= {}
       Array(resources).each do |resource|
-        @allowed_params[resource] ||= []
-        @allowed_params[resource] += Array(attributes)
+        @allowed_attributes[resource] ||= []
+        @allowed_attributes[resource] += Array(attributes)
       end
     end
 
