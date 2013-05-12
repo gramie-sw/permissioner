@@ -22,6 +22,5 @@ module Permissioner
     def current_resource
       nil
     end
-
   end
 end

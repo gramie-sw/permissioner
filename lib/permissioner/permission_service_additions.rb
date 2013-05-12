@@ -55,7 +55,7 @@ module Permissioner
     #You can allow a single action or multiple actions at once:
     #
     #   allow_actions :comments, :index
-    #   allow_acitons [:comments, :posts], [:index, :create, :update]
+    #   allow_actions [:comments, :posts], [:index, :create, :update]
     #
     #If a block is given it is stored for the given action and will be evaluated every time the authorization for the
     #action runs. If the block returns true the action is allowed otherwise not. The current_resource will be put

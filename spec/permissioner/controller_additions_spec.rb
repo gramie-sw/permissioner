@@ -103,5 +103,4 @@ describe Permissioner::ControllerAdditions do
       @controller.current_resource.should be_nil
     end
   end
-
 end
