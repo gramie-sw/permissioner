@@ -9,8 +9,8 @@ RSpec::Matchers.define :allow_attribute do |*args|
     permission_service.allow_attribute?(*args)
   end
 end
-RSpec::Matchers.define :passed_filters do |*args|
+RSpec::Matchers.define :pass_filters do |controller, action, params={}|
   match do |permission_service|
-    permission_service.passed_filters?(*args)
+    permission_service.passed_filters?(controller, action, params)
   end
 end

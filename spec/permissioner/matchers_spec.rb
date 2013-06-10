@@ -32,16 +32,21 @@ describe 'matchers' do
     end
   end
 
-  describe 'passed_filters' do
+  describe 'pass_filters' do
 
-    it 'should delegate call to PermissionService#allow_action?' do
-      @permission_service.should_receive(:passed_filters?).with(:comment, :user_id, :text).and_return(true)
-      @permission_service.should passed_filters :comment, :user_id, :text
+    it 'should delegate call to PermissionService#passed_filters?' do
+      @permission_service.should_receive(:passed_filters?).with(:comment, :user_id, :block).and_return(true)
+      @permission_service.should pass_filters :comment, :user_id, :block
     end
 
-    it 'should return false when PermissionService#allow_action? returns false' do
+    it 'should return false when PermissionService#passed_filters? returns false' do
       @permission_service.should_receive(:passed_filters?).and_return(false)
-      @permission_service.should_not passed_filters
+      @permission_service.should_not pass_filters
+    end
+
+    it 'should set empty Hash as default value for params argument' do
+      @permission_service.should_receive(:passed_filters?).with(:comment, :user_id, {}).and_return(true)
+      @permission_service.should pass_filters :comment, :user_id
     end
   end
 end
