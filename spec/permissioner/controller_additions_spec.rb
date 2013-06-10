@@ -16,8 +16,8 @@ describe Permissioner::ControllerAdditions do
       @clazz = Class.new
     end
 
-    it 'should delegate helper methods to permission service' do
-      @clazz.should_receive(:helper_method).with(:allow_action?, :allow_attribute?)
+    it 'should set view helpers' do
+      @clazz.should_receive(:helper_method).with(:allow_action?, :allow_attribute?, :permission_service)
       @clazz.send(:include, Permissioner::ControllerAdditions)
     end
 

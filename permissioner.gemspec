@@ -18,5 +18,5 @@ Gem::Specification.new do |gem|
 
   gem.add_development_dependency "rspec", "~> 2.13"
   gem.add_development_dependency "activesupport", "~>3.2"
-  gem.add_development_dependency "guard-rspec", "~>2.6.0"
+  gem.add_development_dependency "guard-rspec", "~>3.0.1"
 end

@@ -2,7 +2,7 @@ module Permissioner
   module ControllerAdditions
 
     def self.included(base)
-      base.helper_method :allow_action?, :allow_attribute?
+      base.helper_method :allow_action?, :allow_attribute?, :permission_service
       base.delegate :allow_action?, :allow_attribute?, to: :permission_service
     end
 

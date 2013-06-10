@@ -21,8 +21,9 @@ describe Permissioner::PermissionConfigurer do
     end
 
     it 'should delegate call to add_filter to permission_service' do
-      @permissioin_configurer.should_receive(:add_filter).with(:comments, :create, Proc.new {})
-      @permissioin_configurer.add_filter(:comments, :create, Proc.new {})
+      block = Proc.new {}
+      @permissioin_configurer.should_receive(:add_filter).with(:comments, :create, &block)
+      @permissioin_configurer.add_filter(:comments, :create, &block)
     end
   end
 
