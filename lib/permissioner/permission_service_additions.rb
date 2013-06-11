@@ -1,21 +1,13 @@
 module Permissioner
   module PermissionServiceAdditions
 
-    module ClassMethods
-
-      def create current_user
-        permission_service = self.new
-        permission_service.current_user = current_user
-        permission_service.configure_permissions
-        permission_service
-      end
-    end
-
-    def self.included(base)
-      base.extend(ClassMethods)
-    end
-
     attr_accessor :current_user
+
+    def initialize current_user=nil
+      @current_user = current_user
+      configure_permissions
+    end
+
 
     def allow_action?(controller, action, resource = nil)
       allowed = @allow_all || (@allowed_actions && @allowed_actions[[controller.to_s, action.to_s]])

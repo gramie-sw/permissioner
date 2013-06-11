@@ -85,14 +85,14 @@ describe Permissioner::ControllerAdditions do
       permission_service_1.should eq permission_service_2
     end
 
-    it 'should create PermissionService by calling PermissionService::create' do
-      PermissionService.should_receive(:create)
+    it 'should create PermissionService by calling PermissionService::new' do
+      PermissionService.should_receive(:new)
       @controller.permission_service
     end
 
-    it 'should pass current_user to PermissionService::create' do
+    it 'should pass current_user to PermissionService::initialize' do
       @controller.should_receive(:current_user).and_return('current_user')
-      PermissionService.should_receive(:create).with('current_user')
+      PermissionService.should_receive(:new).with('current_user')
       @controller.permission_service
     end
   end

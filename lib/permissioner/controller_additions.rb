@@ -16,7 +16,7 @@ module Permissioner
     end
 
     def permission_service
-      @permission_service ||= PermissionService.create(current_user)
+      @permission_service ||= PermissionService.new(current_user)
     end
 
     def current_resource
