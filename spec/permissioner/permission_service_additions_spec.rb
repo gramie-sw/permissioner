@@ -191,12 +191,19 @@ describe Permissioner::PermissionServiceAdditions do
       allowed_params[:comment].should eq [:text]
     end
 
-    it 'should add resource and attribute to @allowed_params if multiple given' do
+    it 'should add resource and attributes to @allowed_params if multiple given' do
       permission_service.allow_attributes [:comment, :post], [:user, :text]
       allowed_params = permission_service.instance_variable_get(:@allowed_attributes)
       allowed_params.count.should eq 2
       allowed_params[:comment].should eq [:user, :text]
       allowed_params[:post].should eq [:user, :text]
+    end
+
+    it 'should add resource and attributes to @allowed_params if attributes is a Hash' do
+      permission_service.allow_attributes :comment, {attributes: [:user, :text]}
+      allowed_params = permission_service.instance_variable_get(:@allowed_attributes)
+      allowed_params.count.should eq 1
+      allowed_params[:comment].should eq [{attributes: [:user, :text]}]
     end
   end
 

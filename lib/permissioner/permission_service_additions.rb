@@ -66,7 +66,11 @@ module Permissioner
       @allowed_attributes ||= {}
       Array(resources).each do |resource|
         @allowed_attributes[resource] ||= []
-        @allowed_attributes[resource] += Array(attributes)
+        if attributes.is_a?(Hash)
+          @allowed_attributes[resource] << attributes
+        else
+          @allowed_attributes[resource] += Array(attributes)
+        end
       end
     end
 
