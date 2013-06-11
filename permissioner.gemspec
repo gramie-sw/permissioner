@@ -8,8 +8,10 @@ Gem::Specification.new do |gem|
   gem.version = Permissioner::VERSION
   gem.authors = ["Daniel Grawunder, Christian Mierich"]
   gem.email = ["gramie.sw@gmail.com"]
-  gem.description = %q{A Ruby on Rails authorization gem}
+  gem.homepage = "https://github.com/gramie-sw/permissioner"
+  gem.description = %q{A Ruby on  Rails authorization gem}
   gem.summary = %q{An easy to use authorization solution for Ruby on Rails.}
+  gem.license = "EPL 1.0"
 
   gem.files = `git ls-files`.split($/)
   gem.executables = gem.files.grep(%r{^bin/}).map { |f| File.basename(f) }
