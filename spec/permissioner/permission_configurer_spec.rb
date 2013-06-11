@@ -2,60 +2,60 @@ require 'spec_helper'
 
 describe Permissioner::PermissionConfigurer do
 
-  before :each do
-    @permission_configurer_class = Class.new
-    @permission_configurer_class.send(:include, Permissioner::PermissionConfigurer)
-    @permissioin_configurer = @permission_configurer_class.new
+  let(:permission_configurer_class) do
+    permission_configurer_class = Class.new
+    permission_configurer_class.send(:include, Permissioner::PermissionConfigurer)
+    permission_configurer_class
   end
 
   context 'delegation' do
+    let(:permission_service) { double('PermissionService') }
+    let(:permission_configurer) { permission_configurer_class.new(permission_service, 'current_user') }
 
     it 'should delegate call to allow_actions to permission_service' do
-      @permissioin_configurer.should_receive(:allow_actions).with(:comments, :index)
-      @permissioin_configurer.allow_actions(:comments, :index)
+      permission_service.should_receive(:allow_actions).with(:comments, :index)
+      permission_configurer.allow_actions(:comments, :index)
     end
 
     it 'should delegate call to allow_attributes to permission_service' do
-      @permissioin_configurer.should_receive(:allow_attributes).with(:comment, [:user_id, :text])
-      @permissioin_configurer.allow_attributes(:comment, [:user_id, :text])
+      permission_service.should_receive(:allow_attributes).with(:comment, [:user_id, :text])
+      permission_configurer.allow_attributes(:comment, [:user_id, :text])
     end
 
     it 'should delegate call to add_filter to permission_service' do
       block = Proc.new {}
-      @permissioin_configurer.should_receive(:add_filter).with(:comments, :create, &block)
-      @permissioin_configurer.add_filter(:comments, :create, &block)
+      permission_service.should_receive(:add_filter).with(:comments, :create, &block)
+      permission_configurer.add_filter(:comments, :create, &block)
     end
   end
 
-  describe '::included' do
+  context 'setters' do
+    subject(:permission_configurer){ permission_configurer_class.new(nil, nil) }
 
-    it 'should extend including class with module Permissioner::PermissionConfigurer::ClassMethods' do
-      clazz = Class.new
-      clazz.should_receive(:extend).with(Permissioner::PermissionConfigurer::ClassMethods)
-      clazz.send(:include, Permissioner::PermissionConfigurer)
+    it 'should respond_to permission_service' do
+      should respond_to(:permission_service)
+    end
+
+    it 'should respond_to current_user' do
+      should respond_to(:current_user)
     end
   end
-  
-  describe '::create' do
 
-    it 'should return permission_service instance' do
-      permission_service = @permission_configurer_class.create(nil, nil)
-      permission_service.class.included_modules.should include(Permissioner::PermissionConfigurer)
-    end
+  describe '#initialize' do
 
     it 'should set permission_service' do
-      @permission_configurer_class.any_instance.should_receive(:permission_service=).with('permission_service')
-      @permission_configurer_class.create('permission_service', nil)
+      permission_configurer = permission_configurer_class.new('permission_service', nil)
+      permission_configurer.permission_service.should eq 'permission_service'
     end
 
     it 'should set current_user' do
-      @permission_configurer_class.any_instance.should_receive(:current_user=).with('current_user')
-      @permission_configurer_class.create(nil, 'current_user')
+      permission_configurer = permission_configurer_class.new(nil, 'current_user')
+      permission_configurer.current_user.should eq 'current_user'
     end
 
     it 'should call configure_permissions current_user' do
-      @permission_configurer_class.any_instance.should_receive(:configure_permissions)
-      @permission_configurer_class.create(nil, nil)
+      permission_configurer_class.any_instance.should_receive(:configure_permissions)
+      permission_configurer_class.new(nil, nil)
     end
   end
 end

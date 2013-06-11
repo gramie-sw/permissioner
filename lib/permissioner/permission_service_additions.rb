@@ -81,11 +81,11 @@ module Permissioner
       end
     end
 
-    # Configures permissions by calling the factory method ::create on the given class which is intended to include
+    # Configures permissions by instantiate a new object of the given class which is intended to include
     # the module Permissioner::PermissionConfigurer.
     #
     def configure configurer_class
-      configurer_class.create(self, current_user)
+      configurer_class.new(self, current_user)
     end
 
     # Should be overwritten by the including class and is called during initialization in ::create.

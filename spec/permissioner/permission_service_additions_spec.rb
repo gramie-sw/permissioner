@@ -237,10 +237,10 @@ describe Permissioner::PermissionServiceAdditions do
 
   describe 'configure' do
 
-    it 'should call create on the given configurer class' do
+    it 'should create new instance of given configurer class' do
       permission_service.stub(:current_user).and_return('current_user')
       configurer_class = double('permission_configurer')
-      configurer_class.should_receive(:create).with(permission_service, 'current_user')
+      configurer_class.should_receive(:new).with(permission_service, 'current_user')
       permission_service.configure(configurer_class)
     end
   end

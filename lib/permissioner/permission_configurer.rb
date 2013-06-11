@@ -26,28 +26,16 @@ module Permissioner
   #
   module PermissionConfigurer
 
-    attr_accessor :current_user, :permission_service
+    attr_reader :current_user, :permission_service
     delegate :allow_actions, :allow_attributes, :add_filter, to: :permission_service
 
-    module ClassMethods
 
-      # Calling this method is the only intended way for creating an instance of the including class. It ensures the
-      # correct initialization and configurations of the permissions.
-      #
-      # Expects the an instance of a class including module Permissioner::PermissionServiceAdditions acting as
-      # permission service and current signed in user.
-      #
-      def create permission_service, current_user
-        permission_configurer= self.new
-        permission_configurer.permission_service = permission_service
-        permission_configurer.current_user = current_user
-        permission_configurer.configure_permissions
-        permission_configurer
-      end
-    end
-
-    def self.included(base)
-      base.extend(ClassMethods)
+    # Expects an instance of a class including module Permissioner::PermissionServiceAdditions acting as
+    # permission service and current signed in user.
+    def initialize permission_service, current_user
+      @permission_service = permission_service
+      @current_user = current_user
+      configure_permissions
     end
 
     # Should be overwritten by the including class and is called during initialization in ::create.
