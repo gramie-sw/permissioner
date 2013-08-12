@@ -37,6 +37,16 @@ describe Permissioner::ServiceAdditions do
         permission_service.allow_action?(:comments, :index).should be_true
       end
 
+      it 'should also except arguments as string' do
+        permission_service.allow_actions :comments, :index
+        permission_service.allow_action?('comments', 'index').should be_true
+      end
+
+      it 'should return true for every action when all actions are allowed' do
+        permission_service.allow_actions :comments, :all
+        permission_service.allow_action?(:comments, :index).should be_true
+      end
+
       it 'should return false if given action not allowed' do
         permission_service.allow_action?(:comments, :index).should be_false
         permission_service.allow_actions :comments, :create
@@ -117,12 +127,12 @@ describe Permissioner::ServiceAdditions do
       permission_service.allow_attribute?(:comment, :user_id).should be_true
     end
 
-    it 'should return true when param is allowed' do
+    it 'should return true when attribute is allowed' do
       permission_service.allow_attributes(:comment, :user_id)
       permission_service.allow_attribute?(:comment, :user_id).should be_true
     end
 
-    it 'should return false when param not allowed' do
+    it 'should return false when attribute not allowed' do
       permission_service.allow_attribute?(:comment, :user_id).should be_false
     end
   end

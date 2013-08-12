@@ -8,9 +8,11 @@ module Permissioner
       configure_permissions
     end
 
-
     def allow_action?(controller, action, resource = nil)
-      allowed = @allow_all || (@allowed_actions && @allowed_actions[[controller.to_s, action.to_s]])
+      allowed =
+          @allow_all ||
+          (@allowed_actions &&
+              (@allowed_actions[[controller.to_s, action.to_s]] || @allowed_actions[[controller.to_s, 'all']]))
       allowed && (allowed == true || resource && allowed.call(resource))
     end
 
