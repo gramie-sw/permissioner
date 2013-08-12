@@ -1,10 +1,10 @@
 require 'spec_helper'
 
-describe Permissioner::PermissionServiceAdditions do
+describe Permissioner::ServiceAdditions do
 
   let(:permission_service_class) do
     permission_service_class = Class.new
-    permission_service_class.send(:include, Permissioner::PermissionServiceAdditions)
+    permission_service_class.send(:include, Permissioner::ServiceAdditions)
     permission_service_class
   end
 

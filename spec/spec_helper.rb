@@ -5,5 +5,5 @@ require 'permissioner/matchers'
 
 
 class PermissionService
-  include Permissioner::PermissionServiceAdditions
+  include Permissioner::ServiceAdditions
 end

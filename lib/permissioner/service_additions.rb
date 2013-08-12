@@ -1,5 +1,5 @@
 module Permissioner
-  module PermissionServiceAdditions
+  module ServiceAdditions
 
     attr_accessor :current_user
 
