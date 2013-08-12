@@ -1,0 +1,47 @@
+module Permissioner
+  module Matchers
+    class ExactlyAllowControllers
+
+      def initialize(*expected_controllers)
+        @expected_controllers = expected_controllers.collect { |controller| controller.to_s }
+      end
+
+      def matches?(permission_service)
+        controllers_exactly_match?(allowed_controllers(permission_service))
+      end
+
+      def failure_message_for_should(permission_service)
+        "expected to exactly allow controllers \n" \
+          "#{@expected_controllers} are allowed, but found controllers\n"\
+          "#{allowed_controllers(permission_service)} allowed"
+      end
+
+      def failure_message_for_should_not(permission_service)
+        "expected to exactly not allow controllers \n" \
+          "#{@expected_controllers}, but these controllers are exactly allowed\n"\
+      end
+
+      private
+
+      def allowed_controllers(permission_service)
+        @allowed_controllers ||= begin
+          all_allowed_actions = permission_service.instance_variable_get(:@allowed_actions)
+          if all_allowed_actions
+            all_allowed_actions.keys.collect { |e| e.first }.uniq
+          else
+            []
+          end
+        end
+      end
+
+      def all_controllers_allowed?(allowed_controllers)
+        @expected_controllers.all? { |controller| allowed_controllers.include? controller }
+      end
+
+      def controllers_exactly_match?(allowed_controllers)
+        allowed_controllers.count == @expected_controllers.count && all_controllers_allowed?(allowed_controllers)
+      end
+
+    end
+  end
+end

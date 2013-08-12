@@ -48,46 +48,6 @@ describe 'matchers' do
     end
   end
 
-  describe 'exactly_allow_controllers' do
-
-    context 'actions are allowed' do
-
-      before :each do
-        permission_service.allow_actions :comments, :index
-        permission_service.allow_actions :comments, :create
-        permission_service.allow_actions :users, :index
-        permission_service.allow_actions :posts, :update
-      end
-
-      it 'should pass if exactly given controllers are allowed' do
-        permission_service.should exactly_allow_controllers :comments, :users, :posts
-      end
-
-      it 'should also except arguments as string' do
-        permission_service.should exactly_allow_controllers 'comments', 'users', 'posts'
-      end
-
-      it 'should not pass if one controller is not allowed' do
-        permission_service.should_not exactly_allow_controllers :comments, :users, :posts, :blogs
-      end
-
-      it 'should not pass if more controllers allowed than tested' do
-        permission_service.should_not exactly_allow_controllers :comments, :users
-      end
-    end
-
-    context 'no actions are allowed' do
-
-      it 'should pass if no controllers are given' do
-        permission_service.should exactly_allow_controllers
-      end
-
-      it 'should fail if controllers are given' do
-        permission_service.should_not exactly_allow_controllers(:comments)
-      end
-    end
-  end
-
   describe 'exactly_allow_actions' do
 
     context 'actions are allowed' do
@@ -98,6 +58,11 @@ describe 'matchers' do
 
       it 'should pass if for given controller given actions are exactly allowed for given' do
         permission_service.should exactly_allow_actions :comments, [:index, :edit, :update]
+      end
+
+      it 'should pass if for given controller all actions are allowed and all is given' do
+        permission_service.allow_actions :comments, :all
+        permission_service.should exactly_allow_actions :comments, :all
       end
 
       it 'should also except arguments as string' do
@@ -116,25 +81,29 @@ describe 'matchers' do
         permission_service.allow_actions :users, :index
         permission_service.should exactly_allow_actions :users, :index
       end
+
+      it 'should have failure message for should' do
+        matcher = exactly_allow_actions :users, [:index, :create]
+        permission_service.should_not matcher
+        expected_message =
+            "expected that for \"UsersController\" exactly actions\n"\
+        "[\"index\", \"create\"] are allowed, but found actions\n"\
+        "[\"index\", \"edit\", \"update\"] as allowed"
+        matcher.failure_message_for_should.should eq expected_message
+      end
     end
 
     context 'no actions are allowed' do
 
-      it 'should pass if no actions are given' do
-        permission_service.should exactly_allow_actions
-      end
-
-      it 'should pass if only controller is given' do
-        permission_service.should exactly_allow_actions(:comments)
-      end
-
-      it 'should fail if actions are given' do
-        permission_service.should_not exactly_allow_actions(:comments, :index)
+      it 'should fail with no error by getting failure message' do
+        matcher = exactly_allow_actions(:comments, :index)
+        permission_service.should_not matcher
+        matcher.failure_message_for_should
       end
     end
   end
 
-  describe 'exactly_allow_actions' do
+  describe 'exactly_allow_attributes' do
 
     context 'attributes are allowed' do
 
