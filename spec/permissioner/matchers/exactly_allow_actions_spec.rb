@@ -26,7 +26,7 @@ describe Permissioner::Matchers::ExactlyAllowActions do
     it 'should raise an exception if multiple actions not stated as array' do
       expect {
         create_matcher [:controller, :action_1, :action_2]
-      }.to raise_exception "multiple actions for a controller must stated in an array, e.g. [:new, :create]"
+      }.to raise_exception "multiple actions for a controller must stated as array, e.g. [:new, :create]"
     end
   end
 
@@ -34,7 +34,7 @@ describe Permissioner::Matchers::ExactlyAllowActions do
 
     context 'on success' do
 
-      it 'should return true if all expected controller with actions are exactly allowed' do
+      it 'should return true if all expected controllers with actions are exactly allowed' do
         matcher = create_matcher(
             [:comments, [:index, :show, :new, :create]],
             [:users, [:show, :new, :create]],
@@ -54,7 +54,7 @@ describe Permissioner::Matchers::ExactlyAllowActions do
       end
     end
 
-    context 'if controller did not match' do
+    context 'if controllers did not match' do
 
       it 'should return false if at least one expected controller is not allowed' do
         matcher = create_matcher(
@@ -107,12 +107,12 @@ describe Permissioner::Matchers::ExactlyAllowActions do
 
   describe '#failure_message_for_should' do
 
-    context 'if controller did not match' do
+    context 'if controllers did not match' do
 
       it 'should be available' do
         matcher = create_matcher(
-            [:users, [:show, :new, :create]],
-            [:posts, [:show, :edit, :update]]
+            [:users, []],
+            [:posts, []]
         )
         expected_messages =
             "expected to find allowed actions for controllers \n" \
@@ -125,8 +125,8 @@ describe Permissioner::Matchers::ExactlyAllowActions do
 
       it 'should work if no controller allowed' do
         matcher = create_matcher(
-            [:users, [:show, :new, :create]],
-            [:posts, [:show, :edit, :update]]
+            [:users, []],
+            [:posts, []]
         )
         #call is necessary because matches sets @permission_service
         matcher.matches?(PermissionService.new)
@@ -143,7 +143,7 @@ describe Permissioner::Matchers::ExactlyAllowActions do
             [:posts, [:show, :edit, :update]]
         )
         expected_messages =
-            "expected allowed actions did not match for following controllers:\n"\
+            "expected actions did not match for following controllers:\n"\
             "comments:\n"\
             "[\"create\", \"new\", \"show\"] were expected to be allowed, but actions\n"\
             "[\"create\", \"index\", \"new\", \"show\"] are allowed\n"\
@@ -174,14 +174,14 @@ describe Permissioner::Matchers::ExactlyAllowActions do
 
     it 'should be available' do
       matcher = create_matcher
-      expected_messages = "given actions are exactly allowed although this is not expected"
+      expected_messages = 'given actions are exactly allowed although this is not expected'
       matcher.failure_message_for_should_not.should eq expected_messages
     end
 
     it 'should be available' do
       matcher = create_matcher
       matcher.matches?(PermissionService.new)
-      matcher.failure_message_for_should.should be_kind_of(String)
+      matcher.failure_message_for_should_not.should be_kind_of(String)
     end
   end
 

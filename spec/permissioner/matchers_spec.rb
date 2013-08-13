@@ -66,8 +66,9 @@ describe Permissioner::Matchers do
   describe '#exactly_allow_attributes' do
 
     it 'should return correctly instantiated instance of ExactlyAllowAttributes' do
-      Permissioner::Matchers::ExactlyAllowAttributes.should_receive(:new).with(:resource, :attributes).and_call_original
-      matcher_helper.exactly_allow_attributes(:resource, :attributes).should be_kind_of(Permissioner::Matchers::ExactlyAllowAttributes)
+      expected_attributes = [:resource_1, :attribute_1], [:resource_2, :attribute_2]
+      Permissioner::Matchers::ExactlyAllowAttributes.should_receive(:new).with(*expected_attributes).and_call_original
+      matcher_helper.exactly_allow_attributes(*expected_attributes).should be_kind_of(Permissioner::Matchers::ExactlyAllowAttributes)
     end
   end
 

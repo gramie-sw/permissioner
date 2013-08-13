@@ -3,11 +3,10 @@ module Permissioner
     class ExactlyAllowActions
 
       def initialize(*all_expected_actions)
-        all_expected_actions.collect! do |e|
-          raise 'multiple actions for a controller must stated in an array, e.g. [:new, :create]' if e.size > 2
-          [e[0].to_s, Array(e[1]).collect! { |e| e.to_s }]
+        @all_expected_actions = all_expected_actions.collect do |value|
+          raise 'multiple actions for a controller must stated as array, e.g. [:new, :create]' if value.size > 2
+          [value[0].to_s, Array(value[1]).collect! { |e| e.to_s }]
         end
-        @all_expected_actions = all_expected_actions
         @failing_actions = []
       end
 
@@ -22,7 +21,7 @@ module Permissioner
           "#{all_expected_controllers}, but found allowed actions for controllers\n"\
           "#{all_allowed_controllers}"
         else
-          message = "expected allowed actions did not match for following controllers:\n"
+          message = "expected actions did not match for following controllers:\n"
           @failing_actions.inject(message) do |msg, value|
             msg +=
                 "#{value[0]}:\n"\
@@ -34,7 +33,7 @@ module Permissioner
       end
 
       def failure_message_for_should_not
-        "given actions are exactly allowed although this is not expected"
+        'given actions are exactly allowed although this is not expected'
       end
 
       private
@@ -75,11 +74,11 @@ module Permissioner
         @all_allowed_controllers ||= begin
           all_allowed_actions = @permission_service.instance_variable_get(:@allowed_actions)
           if all_allowed_actions
-            all_allowed_actions.keys.collect { |e| e.first }.uniq
+            all_allowed_actions.keys.collect { |e| e.first }.uniq.sort
           else
             []
           end
-        end.sort
+        end
       end
 
       def all_expected_controllers
