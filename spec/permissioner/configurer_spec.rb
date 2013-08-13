@@ -1,10 +1,10 @@
 require 'spec_helper'
 
-describe Permissioner::PermissionConfigurer do
+describe Permissioner::Configurer do
 
   let(:permission_configurer_class) do
     permission_configurer_class = Class.new
-    permission_configurer_class.send(:include, Permissioner::PermissionConfigurer)
+    permission_configurer_class.send(:include, Permissioner::Configurer)
     permission_configurer_class
   end
 

@@ -24,7 +24,7 @@ module Permissioner
   #     end
   # end
   #
-  module PermissionConfigurer
+  module Configurer
 
     attr_reader :current_user, :permission_service
     delegate :allow_actions, :allow_attributes, :add_filter, to: :permission_service

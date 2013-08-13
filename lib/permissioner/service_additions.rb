@@ -87,6 +87,10 @@ module Permissioner
       end
     end
 
+    def clear_filters
+      @filters = nil
+    end
+
     # Configures permissions by instantiate a new object of the given class which is intended to include
     # the module Permissioner::PermissionConfigurer.
     #
