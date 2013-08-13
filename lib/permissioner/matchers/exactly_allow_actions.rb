@@ -8,13 +8,20 @@ module Permissioner
       end
 
       def matches?(permission_service)
-        expected_actions_exactly_match? all_allowed_actions(permission_service) 
+        expected_actions_exactly_match? all_allowed_actions(permission_service)
       end
 
       def failure_message_for_should(permission_service)
-        "expected that for \"#{@controller.capitalize}Controller\" exactly actions\n" \
-        "#{@expected_actions} are allowed, but found actions\n"\
-        "#{all_allowed_actions(permission_service).keys.collect { |e| e[1] } } allowed"
+        "expected that for \"#{@controller.capitalize}Controller\" actions\n" \
+        "#{@expected_actions.sort} are exactly allowed, but found actions\n"\
+        "#{allowed_actions_for_controller(all_allowed_actions(permission_service)).sort} allowed"
+      end
+
+      def failure_message_for_should_not(permission_service)
+        "expected to exactly not allow actions"\
+        "#{@expected_actions.sort} for #{@controller.capitalize}Controllers \n"\
+        "#but these actions are exactly allowed\n"\
+
       end
 
       private
@@ -23,19 +30,26 @@ module Permissioner
         if @expected_actions == ['all']
           all_allowed_actions.include?([@controller, 'all'])
         else
-          allowed_actions_for_controller(all_allowed_actions).count == @expected_actions.count && all_expected_actions_allowed?(all_allowed_actions)
+          allowed_actions_for_controller(all_allowed_actions).count == @expected_actions.count &&
+              all_expected_actions_allowed?(all_allowed_actions)
         end
       end
 
       def all_allowed_actions(permission_service)
         @all_allowed_actions ||= begin
-          permission_service.instance_variable_get(:@allowed_actions) || []
+          permission_service.instance_variable_get(:@allowed_actions) || {}
         end
       end
 
       def allowed_actions_for_controller(all_allowed_actions)
-        all_allowed_actions.keys.inject([]) do |allowed_actions, e|
-          allowed_actions << e[1] if e[0] == @controller end.uniq
+        @allowed_actions_for_controller ||= begin
+          all_allowed_actions.keys.inject([]) do |allowed_actions, e|
+            if e[0] == @controller
+              allowed_actions << e[1]
+            end
+            allowed_actions
+          end.uniq
+        end
       end
 
       def all_expected_actions_allowed?(all_allowed_actions)

@@ -12,13 +12,13 @@ module Permissioner
 
       def failure_message_for_should(permission_service)
         "expected to exactly allow controllers \n" \
-          "#{@expected_controllers} are allowed, but found controllers\n"\
-          "#{allowed_controllers(permission_service)} allowed"
+          "#{@expected_controllers.sort}, but found controllers\n"\
+          "#{allowed_controllers(permission_service).sort} allowed"
       end
 
       def failure_message_for_should_not(permission_service)
         "expected to exactly not allow controllers \n" \
-          "#{@expected_controllers}, but these controllers are exactly allowed\n"\
+          "#{@expected_controllers.sort}, but these controllers are exactly allowed\n"\
       end
 
       private

@@ -1,10 +1,16 @@
 require 'spec_helper'
 
-describe 'matchers' do
+describe Permissioner::Matchers do
+
+  let(:matcher_helper) do
+    matcher_helper = Class.new
+    matcher_helper.extend(Permissioner::Matchers)
+    matcher_helper
+  end
 
   let(:permission_service) { PermissionService.new }
 
-  describe 'allow_action' do
+  describe '#allow_action' do
 
     it 'should delegate call to PermissionService#allow_action? and pass when is returns true' do
       permission_service.should_receive(:allow_action?).with(:comments, :index).and_return(true)
@@ -17,7 +23,7 @@ describe 'matchers' do
     end
   end
 
-  describe 'allow_attribute' do
+  describe '#allow_attribute' do
 
     it 'should delegate call to PermissionService#allow_action? and pass when is returns true' do
       permission_service.should_receive(:allow_attribute?).with(:comment, :user_id, :text).and_return(true)
@@ -30,7 +36,7 @@ describe 'matchers' do
     end
   end
 
-  describe 'pass_filters' do
+  describe '#pass_filters' do
 
     it 'should delegate call to PermissionService#passed_filters? and pass when is returns true' do
       permission_service.should_receive(:passed_filters?).with(:comment, :user_id, :block).and_return(true)
@@ -48,95 +54,27 @@ describe 'matchers' do
     end
   end
 
-  describe 'exactly_allow_actions' do
+  describe '#exactly_allow_actions' do
 
-    context 'actions are allowed' do
-
-      before :each do
-        permission_service.allow_actions :comments, [:index, :edit, :update]
-      end
-
-      it 'should pass if for given controller given actions are exactly allowed for given' do
-        permission_service.should exactly_allow_actions :comments, [:index, :edit, :update]
-      end
-
-      it 'should pass if for given controller all actions are allowed and all is given' do
-        permission_service.allow_actions :comments, :all
-        permission_service.should exactly_allow_actions :comments, :all
-      end
-
-      it 'should also except arguments as string' do
-        permission_service.should exactly_allow_actions 'comments', ['index', 'edit', 'update']
-      end
-
-      it 'should fail if for given controller not all given actions are allowed' do
-        permission_service.should_not exactly_allow_actions :comments, [:index, :edit, :new]
-      end
-
-      it 'should fail if for given controller more than given actions are allowed' do
-        permission_service.should_not exactly_allow_actions :comments, [:index, :edit]
-      end
-
-      it 'should except actions as single symbol when only one given' do
-        permission_service.allow_actions :users, :index
-        permission_service.should exactly_allow_actions :users, :index
-      end
-
-      it 'should have failure message for should' do
-        matcher = exactly_allow_actions :users, [:index, :create]
-        permission_service.should_not matcher
-        expected_message =
-            "expected that for \"UsersController\" exactly actions\n"\
-        "[\"index\", \"create\"] are allowed, but found actions\n"\
-        "[\"index\", \"edit\", \"update\"] as allowed"
-        matcher.failure_message_for_should.should eq expected_message
-      end
-    end
-
-    context 'no actions are allowed' do
-
-      it 'should fail with no error by getting failure message' do
-        matcher = exactly_allow_actions(:comments, :index)
-        permission_service.should_not matcher
-        matcher.failure_message_for_should
-      end
+    it 'should return correctly instantiated instance of ExactlyAllowActions' do
+      Permissioner::Matchers::ExactlyAllowActions.should_receive(:new).with(:resource, :actions).and_call_original
+      matcher_helper.exactly_allow_actions(:resource, :actions).should be_kind_of(Permissioner::Matchers::ExactlyAllowActions)
     end
   end
 
-  describe 'exactly_allow_attributes' do
+  describe '#exactly_allow_attributes' do
 
-    context 'attributes are allowed' do
-
-      before :each do
-        permission_service.allow_attributes :user, [:name, :email, :phone]
-      end
-
-      it 'should pass if for given resource exactly all given attributes are allowed' do
-        permission_service.should exactly_allow_attributes :user, [:name, :email, :phone]
-      end
-
-      it 'should fail if for given resource not all given attributes are allowed' do
-        permission_service.should_not exactly_allow_attributes :user, [:name, :email, :street]
-      end
-
-      it 'should fail if for given resource not all allowed attributes are given' do
-        permission_service.should_not exactly_allow_attributes :user, [:name, :email]
-      end
+    it 'should return correctly instantiated instance of ExactlyAllowAttributes' do
+      Permissioner::Matchers::ExactlyAllowAttributes.should_receive(:new).with(:resource, :attributes).and_call_original
+      matcher_helper.exactly_allow_attributes(:resource, :attributes).should be_kind_of(Permissioner::Matchers::ExactlyAllowAttributes)
     end
+  end
 
-    context 'no attributes are allowed' do
+  describe '#exactly_allow_controllers' do
 
-      it 'should pass if no resource is given' do
-        permission_service.should exactly_allow_attributes
-      end
-
-      it 'should pass if only resource is given' do
-        permission_service.should exactly_allow_attributes :comment
-      end
-
-      it 'should not pass if attributes are given' do
-        permission_service.should_not exactly_allow_attributes :comment, :user_id
-      end
+    it 'should return correctly instantiated instance of ExactlyAllowControllers' do
+      Permissioner::Matchers::ExactlyAllowControllers.should_receive(:new).with(:controllers).and_call_original
+      matcher_helper.exactly_allow_controllers(:controllers).should be_kind_of(Permissioner::Matchers::ExactlyAllowControllers)
     end
   end
 

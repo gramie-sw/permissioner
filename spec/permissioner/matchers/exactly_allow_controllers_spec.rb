@@ -52,8 +52,8 @@ describe Permissioner::Matchers::ExactlyAllowControllers do
       matcher = create_matcher(:comments)
       expected_messages =
           "expected to exactly allow controllers \n" \
-          "[\"comments\"] are allowed, but found controllers\n"\
-          "[\"comments\", \"users\", \"posts\"] allowed"
+          "[\"comments\"], but found controllers\n"\
+          "[\"comments\", \"posts\", \"users\"] allowed"
       matcher.failure_message_for_should(permission_service).should eq expected_messages
     end
 
@@ -66,7 +66,7 @@ describe Permissioner::Matchers::ExactlyAllowControllers do
   describe '#failure_message_for_should_not' do
 
     it 'should be available' do
-      matcher = create_matcher(:comments, :users)
+      matcher = create_matcher(:users, :comments)
       expected_messages =
           "expected to exactly not allow controllers \n" \
           "[\"comments\", \"users\"], but these controllers are exactly allowed\n"

@@ -52,17 +52,39 @@ describe Permissioner::Matchers::ExactlyAllowActions do
     end
   end
 
-  #
-  #describe '#failure_message_for_should' do
-  #
-  #  it 'should be available' do
-  #    matcher = create_matcher :users, [:index, :new]
-  #    expected_messages =
-  #        "expected that for \"UsersController\" exactly actions\n"\
-  #        "[\"index\", \"new\"] are allowed, but found actions\n"\
-  #        "[\"index\", \"new\", \"credit\"] allowed"
-  #    matcher.failure_message_for_should(permission_service).should eq expected_messages
-  #  end
-  #end
+  describe '#failure_message_for_should' do
+
+    it 'should be available' do
+      matcher = create_matcher :users, [:index, :new]
+      expected_messages =
+          "expected that for \"UsersController\" actions\n"\
+          "[\"index\", \"new\"] are exactly allowed, but found actions\n"\
+          "[\"create\", \"new\", \"show\"] allowed"
+      matcher.failure_message_for_should(permission_service).should eq expected_messages
+    end
+
+    it 'should work if no controller allowed' do
+      matcher = create_matcher :users, [:index, :new]
+      matcher.failure_message_for_should(PermissionService.new).should be_kind_of(String)
+    end
+  end
+
+  describe '#failure_message_for_should_not' do
+
+    it 'should be available' do
+      matcher = create_matcher :users, [:index, :new, :create]
+      expected_messages =
+          "expected to exactly not allow actions"\
+          "[\"create\", \"index\", \"new\"] for UsersControllers \n"\
+          "#but these actions are exactly allowed\n"
+      matcher.failure_message_for_should_not(permission_service).should eq expected_messages
+    end
+
+
+    it 'should work if no controller allowed' do
+      matcher = create_matcher :users, [:index, :new]
+      matcher.failure_message_for_should_not(PermissionService.new).should be_kind_of(String)
+    end
+  end
 
 end
