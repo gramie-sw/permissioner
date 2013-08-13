@@ -57,8 +57,9 @@ describe Permissioner::Matchers do
   describe '#exactly_allow_actions' do
 
     it 'should return correctly instantiated instance of ExactlyAllowActions' do
-      Permissioner::Matchers::ExactlyAllowActions.should_receive(:new).with(:resource, :actions).and_call_original
-      matcher_helper.exactly_allow_actions(:resource, :actions).should be_kind_of(Permissioner::Matchers::ExactlyAllowActions)
+      expected_actions = [:controller_1, :actions_1], [:controller_2, :actions_2]
+      Permissioner::Matchers::ExactlyAllowActions.should_receive(:new).with(*expected_actions).and_call_original
+      matcher_helper.exactly_allow_actions(*expected_actions).should be_kind_of(Permissioner::Matchers::ExactlyAllowActions)
     end
   end
 

@@ -25,8 +25,8 @@ module Permissioner
       end
     end
 
-    def exactly_allow_actions(resource, expected_attributes)
-      ExactlyAllowActions.new(resource, expected_attributes)
+    def exactly_allow_actions(*expected_actions)
+      ExactlyAllowActions.new(*expected_actions)
     end
 
     def exactly_allow_attributes(resource, expected_actions)
