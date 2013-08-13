@@ -73,8 +73,16 @@ describe Permissioner::Matchers do
   describe '#exactly_allow_controllers' do
 
     it 'should return correctly instantiated instance of ExactlyAllowControllers' do
-      Permissioner::Matchers::ExactlyAllowControllers.should_receive(:new).with(:controllers).and_call_original
-      matcher_helper.exactly_allow_controllers(:controllers).should be_kind_of(Permissioner::Matchers::ExactlyAllowControllers)
+      Permissioner::Matchers::ExactlyAllowControllers.should_receive(:new).with(:controller_1, :controller_2).and_call_original
+      matcher_helper.exactly_allow_controllers(:controller_1, :controller_2).should be_kind_of(Permissioner::Matchers::ExactlyAllowControllers)
+    end
+  end
+
+  describe '#exactly_allow_resources' do
+
+    it 'should return correctly instantiated instance of ExactlyAllowControllers' do
+      Permissioner::Matchers::ExactlyAllowResources.should_receive(:new).with(:resource_1, :resource_2).and_call_original
+      matcher_helper.exactly_allow_resources(:resource_1, :resource_2).should be_kind_of(Permissioner::Matchers::ExactlyAllowResources)
     end
   end
 

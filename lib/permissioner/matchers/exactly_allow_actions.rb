@@ -8,18 +8,19 @@ module Permissioner
       end
 
       def matches?(permission_service)
+        @permission_service = permission_service
         expected_actions_exactly_match? all_allowed_actions(permission_service)
       end
 
-      def failure_message_for_should(permission_service)
-        "expected that for \"#{@controller.capitalize}Controller\" actions\n" \
+      def failure_message_for_should
+        "expected that for \"#{to_camelcase @controller}Controller\" actions\n" \
         "#{@expected_actions.sort} are exactly allowed, but found actions\n"\
-        "#{allowed_actions_for_controller(all_allowed_actions(permission_service)).sort} allowed"
+        "#{allowed_actions_for_controller(all_allowed_actions(@permission_service)).sort} allowed"
       end
 
-      def failure_message_for_should_not(permission_service)
+      def failure_message_for_should_not
         "expected to exactly not allow actions"\
-        "#{@expected_actions.sort} for #{@controller.capitalize}Controllers \n"\
+        "#{@expected_actions.sort} for #{to_camelcase @controller}Controllers \n"\
         "#but these actions are exactly allowed\n"\
 
       end
@@ -54,6 +55,11 @@ module Permissioner
 
       def all_expected_actions_allowed?(all_allowed_actions)
         @expected_actions.all? { |action| all_allowed_actions[[@controller, action]] }
+      end
+
+      def to_camelcase(string)
+        return string if string !~ /_/ && self =~ /[A-Z]+.*/
+        string.split('_').map{|e| e.capitalize}.join
       end
 
     end

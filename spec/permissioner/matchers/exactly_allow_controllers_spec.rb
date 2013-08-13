@@ -30,7 +30,7 @@ describe Permissioner::Matchers::ExactlyAllowControllers do
       matcher.matches?(permission_service).should be_true
     end
 
-    it 'should return false if one controller is not allowed' do
+    it 'should return false if at least one controller is not allowed' do
       matcher = create_matcher(:comments, :users, :posts, :blogs)
       matcher.matches?(permission_service).should be_false
     end
@@ -54,12 +54,16 @@ describe Permissioner::Matchers::ExactlyAllowControllers do
           "expected to exactly allow controllers \n" \
           "[\"comments\"], but found controllers\n"\
           "[\"comments\", \"posts\", \"users\"] allowed"
-      matcher.failure_message_for_should(permission_service).should eq expected_messages
+      #call is necessary because matches sets @permission_service
+      matcher.matches?(permission_service)
+      matcher.failure_message_for_should.should eq expected_messages
     end
 
-    it 'should work  if no controller allowed' do
+    it 'should work if no controller allowed' do
       matcher = create_matcher(:comments)
-      matcher.failure_message_for_should(PermissionService.new).should be_kind_of(String)
+      #call is necessary because matches sets @permission_service
+      matcher.matches?((PermissionService.new))
+      matcher.failure_message_for_should.should be_kind_of(String)
     end
   end
 
@@ -70,12 +74,12 @@ describe Permissioner::Matchers::ExactlyAllowControllers do
       expected_messages =
           "expected to exactly not allow controllers \n" \
           "[\"comments\", \"users\"], but these controllers are exactly allowed\n"
-      matcher.failure_message_for_should_not(permission_service).should eq expected_messages
+      matcher.failure_message_for_should_not.should eq expected_messages
     end
 
     it 'should work if no controller allowed' do
       matcher = create_matcher(:comments, :users)
-      matcher.failure_message_for_should_not(PermissionService.new).should be_kind_of(String)
+      matcher.failure_message_for_should_not.should be_kind_of(String)
     end
   end
 

@@ -47,14 +47,16 @@ describe Permissioner::Matchers::ExactlyAllowAttributes do
       matcher = create_matcher :user, [:name, :email, :street]
       expected_messages =
           "expected that for resource \"user\" attributes\n"\
-          "[:email, :name, :street] are exactly allowed, but found attributes\n"\
-          "[:email, :name, :phone] allowed"
-      matcher.failure_message_for_should(permission_service).should eq expected_messages
+          "[:name, :email, :street] are exactly allowed, but found attributes\n"\
+          "[:name, :email, :phone] allowed"
+      matcher.matches?(permission_service)
+      matcher.failure_message_for_should.should eq expected_messages
     end
 
     it 'should work if no controller allowed' do
       matcher = create_matcher :user, [:name, :email, :street]
-      matcher.failure_message_for_should(PermissionService.new).should be_kind_of(String)
+      matcher.matches?(PermissionService.new)
+      matcher.failure_message_for_should.should be_kind_of(String)
     end
   end
 
@@ -64,14 +66,16 @@ describe Permissioner::Matchers::ExactlyAllowAttributes do
       matcher = create_matcher :user, [:name, :email, :street]
       expected_messages =
           "expected that for resource \"user\" attributes\n"\
-          "[:email, :name, :street] are exactly not allowed,\n"\
+          "[:name, :email, :street] are exactly not allowed,\n"\
           "but those attributes are exactly allowed\n"
-      matcher.failure_message_for_should_not(permission_service).should eq expected_messages
+      matcher.matches?(permission_service)
+      matcher.failure_message_for_should_not.should eq expected_messages
     end
 
     it 'should work if no controller allowed' do
       matcher = create_matcher :user, [:name, :email, :street]
-      matcher.failure_message_for_should_not(PermissionService.new).should be_kind_of(String)
+      matcher.matches?(PermissionService.new)
+      matcher.failure_message_for_should_not.should be_kind_of(String)
     end
   end
 end

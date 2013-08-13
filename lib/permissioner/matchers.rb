@@ -1,6 +1,7 @@
 require 'permissioner/matchers/exactly_allow_actions'
 require 'permissioner/matchers/exactly_allow_attributes'
 require 'permissioner/matchers/exactly_allow_controllers'
+require 'permissioner/matchers/exactly_allow_resources'
 
 
 RSpec::Matchers.define :allow_attribute do |*args|
@@ -32,8 +33,12 @@ module Permissioner
       ExactlyAllowAttributes.new(resource, expected_actions)
     end
 
-    def exactly_allow_controllers(expected_controllers)
-      ExactlyAllowControllers.new(expected_controllers)
+    def exactly_allow_controllers(*expected_controllers)
+      ExactlyAllowControllers.new(*expected_controllers)
+    end
+
+    def exactly_allow_resources(*expected_resources)
+      ExactlyAllowResources.new(*expected_resources)
     end
 
   end

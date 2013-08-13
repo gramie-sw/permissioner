@@ -7,25 +7,26 @@ module Permissioner
       end
 
       def matches?(permission_service)
-        controllers_exactly_match?(allowed_controllers(permission_service))
+        @permission_service = permission_service
+        controllers_exactly_match?(allowed_controllers)
       end
 
-      def failure_message_for_should(permission_service)
+      def failure_message_for_should
         "expected to exactly allow controllers \n" \
           "#{@expected_controllers.sort}, but found controllers\n"\
-          "#{allowed_controllers(permission_service).sort} allowed"
+          "#{allowed_controllers.sort} allowed"
       end
 
-      def failure_message_for_should_not(permission_service)
+      def failure_message_for_should_not
         "expected to exactly not allow controllers \n" \
           "#{@expected_controllers.sort}, but these controllers are exactly allowed\n"\
       end
 
       private
 
-      def allowed_controllers(permission_service)
+      def allowed_controllers
         @allowed_controllers ||= begin
-          all_allowed_actions = permission_service.instance_variable_get(:@allowed_actions)
+          all_allowed_actions = @permission_service.instance_variable_get(:@allowed_actions)
           if all_allowed_actions
             all_allowed_actions.keys.collect { |e| e.first }.uniq
           else
