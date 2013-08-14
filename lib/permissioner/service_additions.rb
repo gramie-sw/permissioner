@@ -87,7 +87,7 @@ module Permissioner
       end
     end
 
-    def clear_filters
+    def clear_all_filters
       @filters = nil
     end
 

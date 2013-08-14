@@ -267,12 +267,12 @@ describe Permissioner::ServiceAdditions do
     end
   end
 
-  describe '#clear_filters' do
+  describe '#clear_all_filters' do
 
     it 'should set @filters to nil' do
       permission_service.add_filter(:comments, :create, &Proc.new {})
       permission_service.instance_variable_get(:@filters).should_not be_nil
-      permission_service.clear_filters
+      permission_service.clear_all_filters
       permission_service.instance_variable_get(:@filters).should be_nil
     end
   end
