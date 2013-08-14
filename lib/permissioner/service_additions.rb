@@ -91,6 +91,14 @@ module Permissioner
       @filters = nil
     end
 
+    def clear_filters controllers, actions
+      Array(controllers).each do |controller|
+        Array(actions).each do |action|
+          @filters.delete([controller.to_s, action.to_s])
+        end
+      end
+    end
+
     # Configures permissions by instantiate a new object of the given class which is intended to include
     # the module Permissioner::PermissionConfigurer.
     #

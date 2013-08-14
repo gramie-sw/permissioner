@@ -135,7 +135,7 @@ describe Permissioner::ServiceAdditions do
     end
   end
 
-  describe '#allow_attributes?' do
+  describe '#allow_attribute?' do
 
     it 'should return true when @allow_all is true' do
       permission_service.allow_all
@@ -265,6 +265,27 @@ describe Permissioner::ServiceAdditions do
     it 'should rails exception when no block given' do
       expect { permission_service.add_filter(:comments, :index) }.to raise_error('no block given')
     end
+  end
+
+  describe '#clear_filters' do
+
+    before :each do
+      permission_service.add_filter [:users, :comments], [:edit, :update], &Proc.new {}
+    end
+
+    it 'should delete filters for actions if one controller and action are given' do
+      permission_service.clear_filters :users, :edit
+      filters = permission_service.instance_variable_get(:@filters)
+      filters.count.should eq 3
+      filters.should_not have_key([:users, :edit])
+    end
+
+    it 'should delete filters for actions if multiple controllers and actions are given' do
+      permission_service.clear_filters [:users, :comments], [:edit, :update]
+      filters = permission_service.instance_variable_get(:@filters)
+      filters.should be_empty
+    end
+
   end
 
   describe '#clear_all_filters' do
