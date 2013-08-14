@@ -94,29 +94,44 @@ describe Permissioner::ServiceAdditions do
 
     it 'should return true when all blocks for given controller and action returns true' do
       permission_service.add_filter(:comments, :create, &Proc.new { true })
-      permission_service.passed_filters?(:comments, :create, 'params').should be_true
+      permission_service.passed_filters?(:comments, :create, 'params', 'current_resource').should be_true
     end
 
     it 'should return true when no filters are added at all' do
-      permission_service.passed_filters?(:comments, :create, 'params').should be_true
+      permission_service.passed_filters?(:comments, :create, 'params', 'current_resource').should be_true
     end
 
     it 'should return true when for given controller and action no filters has been added' do
       permission_service.add_filter(:comments, :update, &Proc.new {})
-      permission_service.passed_filters?(:comments, :create, 'params').should be_true
+      permission_service.passed_filters?(:comments, :create, 'params', 'current_resource').should be_true
     end
 
     it 'should return false when at least one block for given controller and action returns false' do
       permission_service.add_filter(:comments, :create, &Proc.new { true })
       permission_service.add_filter(:comments, :create, &Proc.new { false })
       permission_service.add_filter(:comments, :create, &Proc.new { true })
-      permission_service.passed_filters?(:comments, :create, 'params').should be_false
+      permission_service.passed_filters?(:comments, :create, 'params', 'current_resource').should be_false
     end
 
     it 'should pass params to the given block' do
       params = Object.new
-      permission_service.add_filter(:comments, :create, &Proc.new { |p| p.object_id.should eq params.object_id })
-      permission_service.passed_filters?(:comments, :create, params)
+      permission_service.add_filter(:comments, :create, &Proc.new { |p, cr| p.should be params })
+      permission_service.passed_filters?(:comments, :create, params, 'current_resource')
+    end
+
+    it 'should pass current_resource to the given block' do
+      current_resource = Object.new
+      permission_service.add_filter(:comments, :create, &Proc.new { |p, cr| cr.should be current_resource })
+      permission_service.passed_filters?(:comments, :create, 'params', current_resource)
+    end
+
+    it 'should set default values for params and current resource' do
+      block = Proc.new do |params, current_resource|
+        params.should eq({})
+        current_resource.should be_nil
+      end
+      permission_service.add_filter(:comments, :create, &block)
+      permission_service.passed_filters?(:comments, :create)
     end
   end
 

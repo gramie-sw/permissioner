@@ -27,6 +27,12 @@ describe Permissioner::Configurer do
       permission_service.should_receive(:add_filter).with(:comments, :create, &block)
       permission_configurer.add_filter(:comments, :create, &block)
     end
+
+    it 'should delegate call to clear_filter to permission_service' do
+      block = Proc.new {}
+      permission_service.should_receive(:clear_filters).with(no_args)
+      permission_configurer.clear_filters
+    end
   end
 
   context 'setters' do

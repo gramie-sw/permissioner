@@ -27,7 +27,7 @@ module Permissioner
   module Configurer
 
     attr_reader :current_user, :permission_service
-    delegate :allow_actions, :allow_attributes, :add_filter, to: :permission_service
+    delegate :allow_actions, :allow_attributes, :add_filter, :clear_filters, to: :permission_service
 
 
     # Expects an instance of a class including module Permissioner::PermissionServiceAdditions acting as

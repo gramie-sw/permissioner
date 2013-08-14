@@ -39,18 +39,13 @@ describe Permissioner::Matchers do
   describe '#pass_filters' do
 
     it 'should delegate call to PermissionService#passed_filters? and pass when is returns true' do
-      permission_service.should_receive(:passed_filters?).with(:comment, :user_id, :block).and_return(true)
-      permission_service.should pass_filters :comment, :user_id, :block
+      permission_service.should_receive(:passed_filters?).with(:comment, :user_id, :params, :current_resource).and_return(true)
+      permission_service.should pass_filters :comment, :user_id, :params, :current_resource
     end
 
     it 'should fail when PermissionService#passed_filters? returns false' do
       permission_service.should_receive(:passed_filters?).and_return(false)
       permission_service.should_not pass_filters
-    end
-
-    it 'should set empty Hash as default value for params argument' do
-      permission_service.should_receive(:passed_filters?).with(:comment, :user_id, {}).and_return(true)
-      permission_service.should pass_filters :comment, :user_id
     end
   end
 
