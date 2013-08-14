@@ -30,20 +30,21 @@ describe Permissioner::ServiceAdditions do
       permission_service.allow_action?(:comments, :index).should be_true
     end
 
-    context 'when no block given' do
+    context 'block not given' do
 
       it 'should return true if given action allowed' do
         permission_service.allow_actions :comments, :index
         permission_service.allow_action?(:comments, :index).should be_true
       end
 
-      it 'should also except arguments as string' do
-        permission_service.allow_actions :comments, :index
-        permission_service.allow_action?('comments', 'index').should be_true
-      end
-
       it 'should return true for every action when all actions are allowed' do
         permission_service.allow_actions :comments, :all
+        permission_service.allow_action?(:comments, :index).should be_true
+      end
+
+      it 'should return true if action is allowed and given filter returns true' do
+        permission_service.add_filter :comments, :index, &Proc.new { true }
+        permission_service.allow_actions :comments, :index
         permission_service.allow_action?(:comments, :index).should be_true
       end
 
@@ -52,9 +53,15 @@ describe Permissioner::ServiceAdditions do
         permission_service.allow_actions :comments, :create
         permission_service.allow_action?(:comments, :index).should be_false
       end
+
+      it 'should return false if action is allowed and given filter returns false' do
+        permission_service.add_filter :comments, :index, &Proc.new { false }
+        permission_service.allow_actions :comments, :index
+        permission_service.allow_action?(:comments, :index).should be_false
+      end
     end
 
-    context 'when block given' do
+    context 'block given' do
 
       it 'should call block for given action when ressource is given' do
         block = Proc.new {}
@@ -76,10 +83,22 @@ describe Permissioner::ServiceAdditions do
         permission_service.allow_action?(:comments, :index, 'resource').should be_true
       end
 
+      it 'should return true if block and given filter returns true' do
+        permission_service.add_filter :comments, :index, &Proc.new { true }
+        permission_service.allow_actions :comments, :index, &Proc.new { true }
+        permission_service.allow_action?(:comments, :index, 'current_resource').should be_true
+      end
+
       it 'should return false when block returns false' do
         block = Proc.new { false }
         permission_service.allow_actions :comments, :index, &block
         permission_service.allow_action?(:comments, :index, 'resource').should be_false
+      end
+
+      it 'should return true if block and given filter returns true' do
+        permission_service.add_filter :comments, :index, &Proc.new { false }
+        permission_service.allow_actions :comments, :index, &Proc.new { true }
+        permission_service.allow_action?(:comments, :index, 'current_resource').should be_false
       end
 
       it 'should return false when no ressource given' do
@@ -87,6 +106,23 @@ describe Permissioner::ServiceAdditions do
         permission_service.allow_actions :comments, :index, &block
         permission_service.allow_action?(:comments, :index).should be_false
       end
+    end
+
+    it 'should also except arguments as string' do
+      permission_service.allow_actions :comments, :index
+      permission_service.allow_action?('comments', 'index').should be_true
+    end
+
+    it 'should pass arguments to passed_filters? if action is principally allowed' do
+      permission_service.allow_actions :comments, :index
+      permission_service.should_receive(:passed_filters?).with(:comments, :index, :current_resource, :params)
+      permission_service.allow_action?(:comments, :index, :current_resource, :params)
+    end
+
+    it 'should have default values for current_resource and params' do
+      permission_service.allow_actions :comments, :index
+      permission_service.should_receive(:passed_filters?).with(:comments, :index, nil, {})
+      permission_service.allow_action?(:comments, :index)
     end
   end
 
@@ -113,22 +149,22 @@ describe Permissioner::ServiceAdditions do
       permission_service.passed_filters?(:comments, :create, 'params', 'current_resource').should be_false
     end
 
-    it 'should pass params to the given block' do
-      params = Object.new
-      permission_service.add_filter(:comments, :create, &Proc.new { |p, cr| p.should be params })
-      permission_service.passed_filters?(:comments, :create, params, 'current_resource')
-    end
-
     it 'should pass current_resource to the given block' do
       current_resource = Object.new
-      permission_service.add_filter(:comments, :create, &Proc.new { |p, cr| cr.should be current_resource })
-      permission_service.passed_filters?(:comments, :create, 'params', current_resource)
+      permission_service.add_filter(:comments, :create, &Proc.new { |cr, p| cr.should be current_resource })
+      permission_service.passed_filters?(:comments, :create, current_resource, 'params')
+    end
+
+    it 'should pass params to the given block' do
+      params = Object.new
+      permission_service.add_filter(:comments, :create, &Proc.new { |cr, p| p.should be params })
+      permission_service.passed_filters?(:comments, :create, 'current_resource', params)
     end
 
     it 'should set default values for params and current resource' do
-      block = Proc.new do |params, current_resource|
-        params.should eq({})
+      block = Proc.new do |current_resource, params|
         current_resource.should be_nil
+        params.should eq({})
       end
       permission_service.add_filter(:comments, :create, &block)
       permission_service.passed_filters?(:comments, :create)

@@ -8,21 +8,22 @@ module Permissioner
       configure_permissions
     end
 
-    def allow_action?(controller, action, resource = nil)
+    def allow_action?(controller, action, current_resource=nil, params={})
       allowed =
           @allow_all ||
           (@allowed_actions &&
               (@allowed_actions[[controller.to_s, action.to_s]] || @allowed_actions[[controller.to_s, 'all']]))
-      allowed && (allowed == true || resource && allowed.call(resource))
+      allowed = allowed && (allowed == true || current_resource && allowed.call(current_resource))
+      allowed && passed_filters?(controller, action, current_resource, params)
     end
 
     def allow_attribute?(resource, attribute)
       @allow_all || @allowed_attributes && @allowed_attributes[resource].try(:include?, attribute)
     end
 
-    def passed_filters?(controller, action, params={}, current_resource=nil)
+    def passed_filters?(controller, action, current_resource=nil, params={})
       if @filters && @filters[[controller.to_s, action.to_s]]
-        @filters[[controller.to_s, action.to_s]].all? { |block| block.call(params, current_resource) }
+        @filters[[controller.to_s, action.to_s]].all? { |block| block.call(current_resource, params) }
       else
         true
       end

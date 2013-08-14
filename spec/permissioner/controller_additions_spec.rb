@@ -33,40 +33,23 @@ describe Permissioner::ControllerAdditions do
 
     before :each do
       @params = {controller: 'comments', action: 'index'}
+      @controller.stub(:current_resource).and_return(:current_resource)
       @controller.stub(:params).and_return(@params)
     end
 
     it 'should call permit_params! if action allwed and filters passed' do
       @controller.permission_service.should_receive(:allow_action?).and_return(true)
-      @controller.permission_service.should_receive(:passed_filters?).and_return(true)
       @controller.permission_service.should_receive(:permit_params!).with(@params)
       @controller.authorize
     end
 
     it 'should call allow_action? with correct parameters' do
-      @controller.stub(:current_resource).and_return('current_resource')
-      @controller.permission_service.should_receive(:allow_action?).with('comments', 'index', 'current_resource').and_return(true)
-      @controller.permission_service.stub(:passed_filters?).and_return(true)
-      @controller.authorize
-    end
-
-    it 'should call passed_filters? with correct parametes' do
-      @controller.stub(:current_resource).and_return('current_resource')
-      @controller.permission_service.stub(:allow_action?).and_return(true)
-      @controller.permission_service.should_receive(:passed_filters?).with('comments', 'index', @params, 'current_resource').and_return(true)
+      @controller.permission_service.should_receive(:allow_action?).with('comments', 'index', :current_resource, @params).and_return(true)
       @controller.authorize
     end
 
     it 'should raise Permissioner::NotAuthorized when action not allowed' do
-      @controller.permission_service.should_receive(:allow_action?).with('comments', 'index', nil).and_return(false)
-      expect {
-        @controller.authorize
-      }.to raise_error Permissioner::NotAuthorized
-    end
-
-    it 'should raise Permissioner::NotAuthorized when action are allowed but filters did not passed' do
-      @controller.permission_service.should_receive(:allow_action?).and_return(true)
-      @controller.permission_service.should_receive(:passed_filters?).and_return(false)
+      @controller.permission_service.should_receive(:allow_action?).with('comments', 'index', :current_resource, @params).and_return(false)
       expect {
         @controller.authorize
       }.to raise_error Permissioner::NotAuthorized
