@@ -47,7 +47,7 @@ module Permissioner
       end
 
       def actions_exactly_match?
-        @all_expected_actions.collect do |controller, expected_actions_for_controller|
+        @all_expected_actions.each do |controller, expected_actions_for_controller|
           expected_actions_for_controller.sort!
           match = actions_for_controller_exactly_match?(controller, expected_actions_for_controller)
           @failing_actions << [controller, expected_actions_for_controller] unless match

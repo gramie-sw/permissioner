@@ -44,16 +44,16 @@ describe Permissioner::ControllerAdditions do
     end
 
     it 'should call allow_action? with correct parameters' do
-      @controller.should_receive(:current_resource).and_return('current_resource')
+      @controller.stub(:current_resource).and_return('current_resource')
       @controller.permission_service.should_receive(:allow_action?).with('comments', 'index', 'current_resource').and_return(true)
       @controller.permission_service.stub(:passed_filters?).and_return(true)
       @controller.authorize
     end
 
-    it 'should call add_filters? with correct parameters' do
-      @controller.should_receive(:current_resource).and_return('current_resource')
+    it 'should call passed_filters? with correct parametes' do
+      @controller.stub(:current_resource).and_return('current_resource')
       @controller.permission_service.stub(:allow_action?).and_return(true)
-      @controller.permission_service.should_receive(:passed_filters?).with('comments', 'index', @params).and_return(true)
+      @controller.permission_service.should_receive(:passed_filters?).with('comments', 'index', @params, 'current_resource').and_return(true)
       @controller.authorize
     end
 

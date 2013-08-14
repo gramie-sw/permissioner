@@ -8,7 +8,7 @@ module Permissioner
 
     def authorize
       if permission_service.allow_action?(params[:controller], params[:action], current_resource) &&
-          permission_service.passed_filters?(params[:controller], params[:action], params)
+          permission_service.passed_filters?(params[:controller], params[:action], params, current_resource)
         permission_service.permit_params!(params)
       else
         raise Permissioner::NotAuthorized

@@ -42,6 +42,26 @@ describe Permissioner::Matchers::ExactlyAllowAttributes do
         )
         matcher.matches?(permission_service).should be_true
       end
+
+      it 'should accept attributs being a hash' do
+        permission_service = PermissionService.new
+        permission_service.allow_attributes(
+            :account,
+            [
+                {user: [:name, :email, :phone]},
+                {adresse: [:name, :street_with_number, :zip_code, :city]},
+            ]
+        )
+        matcher = create_matcher(
+            [:account,
+             [
+                 {user: [:name, :email, :phone]},
+                 {adresse: [:name, :street_with_number, :zip_code, :city]},
+             ]
+            ]
+        )
+        matcher.matches?(permission_service).should be_true
+      end
     end
 
     context 'if resources did not match' do

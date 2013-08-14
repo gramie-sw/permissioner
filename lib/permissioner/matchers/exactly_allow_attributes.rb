@@ -47,11 +47,19 @@ module Permissioner
       end
 
       def attributes_exactly_match?
-        @all_expected_attributes.collect do |resource, expected_attributes_for_resource|
-          expected_attributes_for_resource.sort
-          match = expected_attributes_for_resource == allowed_attrributes_for_resource(resource)
-          @failing_attributes << [resource, expected_attributes_for_resource] unless match
-          match
+        @all_expected_attributes.each do |resource, expected_attributes_for_resource|
+
+          match = expected_attributes_for_resource.count == allowed_attrributes_for_resource(resource).count
+
+          if match
+            match = expected_attributes_for_resource.all? do |expected_attribute|
+              @permission_service.allow_attribute?(resource, expected_attribute)
+            end
+          end
+
+          unless match
+            @failing_attributes << [resource, expected_attributes_for_resource]
+          end
         end
         @failing_attributes.empty?
       end
