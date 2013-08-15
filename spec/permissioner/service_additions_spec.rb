@@ -25,79 +25,64 @@ describe Permissioner::ServiceAdditions do
 
   describe '#allow_action?' do
 
-    it 'should return true if @allow_all is true' do
-      permission_service.allow_all
-      permission_service.allow_action?(:comments, :index).should be_true
-    end
+    context 'filters not given' do
 
-    context 'block not given' do
-
-      it 'should return true if given action allowed' do
+      it 'should return true if action is allowed' do
         permission_service.allow_actions :comments, :index
         permission_service.allow_action?(:comments, :index).should be_true
       end
 
-      it 'should return true for every action when all actions are allowed' do
+      it 'should return true for every action if  all actions of controller are allowed' do
         permission_service.allow_actions :comments, :all
         permission_service.allow_action?(:comments, :index).should be_true
       end
 
-      it 'should return true if action is allowed and given filter returns true' do
-        permission_service.add_filter :comments, :index, &Proc.new { true }
-        permission_service.allow_actions :comments, :index
+      it 'should return true if allow_all is true' do
+        permission_service.allow_all
         permission_service.allow_action?(:comments, :index).should be_true
       end
 
-      it 'should return false if given action not allowed' do
-        permission_service.allow_action?(:comments, :index).should be_false
-        permission_service.allow_actions :comments, :create
-        permission_service.allow_action?(:comments, :index).should be_false
-      end
-
-      it 'should return false if action is allowed and given filter returns false' do
-        permission_service.add_filter :comments, :index, &Proc.new { false }
-        permission_service.allow_actions :comments, :index
+      it 'should return false if actions is not allowed' do
         permission_service.allow_action?(:comments, :index).should be_false
       end
     end
 
-    context 'block given' do
+    context 'filters given' do
 
-      it 'should call block for given action when ressource is given' do
-        block = Proc.new {}
-        block.should_receive(:call)
-        permission_service.allow_actions :comments, :index, &block
-        permission_service.allow_action?(:comments, :index, resource: 'resource')
-      end
-
-      it 'should return true when block returns true' do
-        block = Proc.new { true }
-        permission_service.allow_actions :comments, :index, &block
+      it 'should return true if action is allowed and all filters return true' do
+        permission_service.allow_actions :comments, :index, &Proc.new { true }
+        permission_service.add_filter :comments, :index, &Proc.new { true }
         permission_service.allow_action?(:comments, :index).should be_true
       end
 
-      it 'should return true if block and given filter returns true' do
+      it 'should return true for every action if all actions of controller are allowed and filters return true' do
+        permission_service.allow_actions :comments, :all
         permission_service.add_filter :comments, :index, &Proc.new { true }
-        permission_service.allow_actions :comments, :index, &Proc.new { true }
         permission_service.allow_action?(:comments, :index).should be_true
       end
 
-      it 'should return false when block returns false' do
-        block = Proc.new { false }
-        permission_service.allow_actions :comments, :index, &block
-        permission_service.allow_action?(:comments, :index, resource: 'resource').should be_false
-      end
-
-      it 'should return false if block returns true and given filter returns false' do
-        permission_service.add_filter :comments, :index, &Proc.new { false }
-        permission_service.allow_actions :comments, :index, &Proc.new { true }
-        permission_service.allow_action?(:comments, :index, resource: 'resource').should be_false
-      end
-
-      it 'should return false if block returns false and given filter returns true' do
-        permission_service.add_filter :comments, :index, &Proc.new { true }
+      it 'should return true if allow_all is true but filters return false' do
+        permission_service.allow_all
         permission_service.allow_actions :comments, :index, &Proc.new { false }
-        permission_service.allow_action?(:comments, :index, resource: 'resource').should be_false
+        permission_service.add_filter :comments, :index, &Proc.new { false }
+        permission_service.allow_action?(:comments, :index).should be_true
+      end
+
+      it 'should return false if given action allowed but filters return false' do
+        permission_service.allow_actions :comments, :index, &Proc.new { false }
+        permission_service.allow_action?(:comments, :index).should be_false
+      end
+
+      it 'should return false if given action allowed but at least one filter returns false' do
+        permission_service.allow_actions :comments, :index, &Proc.new { true }
+        permission_service.add_filter :comments, :index, &Proc.new { false }
+        permission_service.allow_action?(:comments, :index).should be_false
+      end
+
+      it 'should return false for every action if all actions of controller are allowed but filters return false' do
+        permission_service.allow_actions :comments, :all
+        permission_service.add_filter :comments, :index, &Proc.new { false }
+        permission_service.allow_action?(:comments, :index).should be_false
       end
     end
 
@@ -215,28 +200,79 @@ describe Permissioner::ServiceAdditions do
 
   describe '#allow_actions' do
 
-    it 'should add controller and action to @allowed_actions' do
-      permission_service.allow_actions :comments, :index
-      allowed_actions = permission_service.instance_variable_get(:@allowed_actions)
-      allowed_actions.count.should eq 1
-      allowed_actions[['comments', 'index']].should be_true
+    context 'block not given' do
+
+      it 'should add actions to @allowed_actions when one action is given' do
+        permission_service.allow_actions :comments, :index
+        allowed_actions = permission_service.instance_variable_get(:@allowed_actions)
+        allowed_actions.count.should eq 1
+        allowed_actions[['comments', 'index']].should be_true
+      end
+
+      it 'should add actions to @allowed_actions when multiple actions are given' do
+        permission_service.allow_actions([:comments, :users], [:index, :create])
+        allowed_actions = permission_service.instance_variable_get(:@allowed_actions)
+        allowed_actions.count.should eq 4
+        allowed_actions[['comments', 'index']].should be_true
+        allowed_actions[['comments', 'create']].should be_true
+        allowed_actions[['users', 'index']].should be_true
+        allowed_actions[['users', 'create']].should be_true
+      end
+
+      it 'should not add any filters' do
+        permission_service.allow_actions :comments, :index
+        filters = permission_service.instance_variable_get(:@filters)
+        filters.count.should eq 0
+      end
     end
 
-    it 'should add controllers and action to @allowed_actions when multiple given' do
-      permission_service.allow_actions([:comments, :users], [:index, :create])
-      allowed_actions = permission_service.instance_variable_get(:@allowed_actions)
-      allowed_actions.count.should eq 4
-      allowed_actions[['comments', 'index']].should be_true
-      allowed_actions[['comments', 'create']].should be_true
-      allowed_actions[['users', 'index']].should be_true
-      allowed_actions[['users', 'create']].should be_true
-    end
+    context 'block given' do
 
-    it 'should add controllers and action to @allowed_actions and store block when given' do
-      block = Proc.new {}
-      permission_service.allow_actions(:comments, :edit, &block)
-      allowed_actions = permission_service.instance_variable_get(:@allowed_actions)
-      allowed_actions[['comments', 'edit']].object_id.should eq block.object_id
+      it 'should add block to @filters one aciton is given' do
+        block = Proc.new {}
+        permission_service.allow_actions :comments, :index, &block
+        filters = permission_service.instance_variable_get(:@filters)
+        filters.count.should eq 1
+        filters[['comments', 'index']].should eq [block]
+      end
+
+      it 'should add block to @filters when multiple actions are given' do
+        block = Proc.new {}
+        permission_service.allow_actions([:comments, :users], [:index, :create], &block)
+        filters = permission_service.instance_variable_get(:@filters)
+        filters.count.should eq 4
+        filters[['comments', 'index']].should eq [block]
+        filters[['comments', 'create']].should eq [block]
+        filters[['users', 'index']].should eq [block]
+        filters[['users', 'create']].should eq [block]
+      end
+
+      it 'should add multiple blocks to @filters fore every actions' do
+        block_1 = Proc.new {}
+        block_2 = Proc.new {}
+        permission_service.allow_actions :comments, :index, &block_1
+        permission_service.allow_actions :comments, :index, &block_2
+        filters = permission_service.instance_variable_get(:@filters)
+        filters.count.should eq 1
+        filters[['comments', 'index']].should eq [block_1, block_2]
+      end
+
+      it 'should add actions to @allowed_actions' do
+        permission_service.allow_actions :comments, :index, &Proc.new {}
+        allowed_actions = permission_service.instance_variable_get(:@allowed_actions)
+        allowed_actions.count.should eq 1
+        allowed_actions[['comments', 'index']].should be_true
+      end
+
+      it 'should raise error if block is given for all actions' do
+        message = 'cannot add filter to :all'
+        expect {
+          permission_service.allow_actions :comments, :all, &Proc.new {}
+        }.to raise_exception message
+        expect {
+          permission_service.allow_actions :comments, 'all', &Proc.new {}
+        }.to raise_exception message
+      end
     end
   end
 
@@ -297,6 +333,16 @@ describe Permissioner::ServiceAdditions do
 
     it 'should rails exception when no block given' do
       expect { permission_service.add_filter(:comments, :index) }.to raise_error('no block given')
+    end
+
+    it 'should raise error if block is given for all actions' do
+      message = 'cannot add filter to :all'
+      expect {
+        permission_service.add_filter :comments, :all, &Proc.new {}
+      }.to raise_exception message
+      expect {
+        permission_service.add_filter :comments, 'all', &Proc.new {}
+      }.to raise_exception message
     end
   end
 

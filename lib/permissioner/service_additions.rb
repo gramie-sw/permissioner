@@ -5,16 +5,16 @@ module Permissioner
 
     def initialize current_user=nil
       @current_user = current_user
+      @filters = {}
       configure_permissions
     end
 
     def allow_action?(controller, action, subjects={})
-      allowed =
-          @allow_all ||
-          (@allowed_actions &&
-              (@allowed_actions[[controller.to_s, action.to_s]] || @allowed_actions[[controller.to_s, 'all']]))
-      allowed = allowed && (allowed == true || allowed.call(subjects[:resource]))
-      allowed && passed_filters?(controller, action, subjects)
+      allowed = @allow_all
+      if !allowed && @allowed_actions
+        allowed = @allowed_actions[[controller.to_s, action.to_s]] || @allowed_actions[[controller.to_s, 'all']]
+      end
+      allowed && (@allow_all || passed_filters?(controller, action, subjects))
     end
 
     def allow_attribute?(resource, attribute)
@@ -61,7 +61,8 @@ module Permissioner
       @allowed_actions ||= {}
       Array(controllers).each do |controller|
         Array(actions).each do |action|
-          @allowed_actions[[controller.to_s, action.to_s]] = block || true
+          @allowed_actions[[controller.to_s, action.to_s]] = true
+          add_block_to_filters(controller, action, &block) if block_given?
         end
       end
     end
@@ -80,11 +81,9 @@ module Permissioner
 
     def add_filter(controllers, actions, &block)
       raise 'no block given' unless block_given?
-      @filters ||= {}
       Array(controllers).each do |controller|
         Array(actions).each do |action|
-          @filters[[controller.to_s, action.to_s]] ||= []
-          @filters[[controller.to_s, action.to_s]] << block
+          add_block_to_filters(controller, action, &block)
         end
       end
     end
@@ -112,6 +111,14 @@ module Permissioner
     # This the intended place where permissions should be configured.
     #
     def configure_permissions
+    end
+
+    private
+
+    def add_block_to_filters(controller, action, &block)
+      raise 'cannot add filter to :all' if action.to_s == 'all'
+      @filters[[controller.to_s, action.to_s]] ||= []
+      @filters[[controller.to_s, action.to_s]] << block
     end
   end
 end
