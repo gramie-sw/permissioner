@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Permissioner::Matchers::ExactlyAllowActions do
+describe Permissioner::Matchers::ExactlyExpectActions do
 
   let(:permission_service) do
     permission_service = PermissionService.new
@@ -11,7 +11,7 @@ describe Permissioner::Matchers::ExactlyAllowActions do
   end
 
   def create_matcher(*all_expected_actions)
-    Permissioner::Matchers::ExactlyAllowActions.new(*all_expected_actions)
+    Permissioner::Matchers::ExactlyExpectActions.new(:@allowed_actions, *all_expected_actions)
   end
 
   describe '#initialize' do
@@ -115,8 +115,8 @@ describe Permissioner::Matchers::ExactlyAllowActions do
             [:posts, []]
         )
         expected_messages =
-            "expected to find allowed actions for controllers \n" \
-          "[\"posts\", \"users\"], but found allowed actions for controllers\n"\
+            "expected to find actions for controllers \n" \
+          "[\"posts\", \"users\"], but found actions for controllers\n"\
           "[\"comments\", \"posts\", \"users\"]"
         #call is necessary because matches sets @permission_service
         matcher.matches?(permission_service)
@@ -145,11 +145,11 @@ describe Permissioner::Matchers::ExactlyAllowActions do
         expected_messages =
             "expected actions did not match for following controllers:\n"\
             "comments:\n"\
-            "[\"create\", \"new\", \"show\"] were expected to be allowed, but actions\n"\
-            "[\"create\", \"index\", \"new\", \"show\"] are allowed\n"\
+            "[\"create\", \"new\", \"show\"] were expected but found actions\n"\
+            "[\"create\", \"index\", \"new\", \"show\"]\n"\
             "users:\n"\
-            "[\"create\", \"new\", \"show\", \"update\"] were expected to be allowed, but actions\n"\
-            "[\"create\", \"new\", \"show\"] are allowed\n"
+            "[\"create\", \"new\", \"show\", \"update\"] were expected but found actions\n"\
+            "[\"create\", \"new\", \"show\"]\n"
         #call is necessary because matches sets @permission_service
         matcher.matches?(permission_service)
         matcher.failure_message_for_should.should eq expected_messages
@@ -174,7 +174,7 @@ describe Permissioner::Matchers::ExactlyAllowActions do
 
     it 'should be available' do
       matcher = create_matcher
-      expected_messages = 'given actions are exactly allowed although this is not expected'
+      expected_messages = 'given actions are exactly match although this is not expected'
       matcher.failure_message_for_should_not.should eq expected_messages
     end
 

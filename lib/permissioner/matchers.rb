@@ -1,8 +1,7 @@
-require 'permissioner/matchers/exactly_allow_actions'
+require 'permissioner/matchers/exactly_expect_actions'
 require 'permissioner/matchers/exactly_allow_attributes'
 require 'permissioner/matchers/exactly_allow_controllers'
 require 'permissioner/matchers/exactly_allow_resources'
-
 
 RSpec::Matchers.define :allow_attribute do |*args|
   match do |permission_service|
@@ -26,7 +25,11 @@ module Permissioner
     end
 
     def exactly_allow_actions(*expected_actions)
-      ExactlyAllowActions.new(*expected_actions)
+      ExactlyExpectActions.new(:@allowed_actions, *expected_actions)
+    end
+
+    def exactly_have_filters_for(*expected_actions)
+      ExactlyExpectActions.new(:@filters, *expected_actions)
     end
 
     def exactly_allow_attributes(*expected_attributes)

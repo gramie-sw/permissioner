@@ -51,10 +51,19 @@ describe Permissioner::Matchers do
 
   describe '#exactly_allow_actions' do
 
-    it 'should return correctly instantiated instance of ExactlyAllowActions' do
+    it 'should return correctly instantiated instance of ExactlyExpectActions' do
       expected_actions = [:controller_1, :actions_1], [:controller_2, :actions_2]
-      Permissioner::Matchers::ExactlyAllowActions.should_receive(:new).with(*expected_actions).and_call_original
-      matcher_helper.exactly_allow_actions(*expected_actions).should be_kind_of(Permissioner::Matchers::ExactlyAllowActions)
+      Permissioner::Matchers::ExactlyExpectActions.should_receive(:new).with(:@allowed_actions, *expected_actions).and_call_original
+      matcher_helper.exactly_allow_actions(*expected_actions).should be_kind_of(Permissioner::Matchers::ExactlyExpectActions)
+    end
+  end
+
+  describe '#exactly_have_filters_for' do
+
+    it 'should return correctly instantiated instance of ExactlyExpectActions' do
+      expected_actions = [:controller_1, :actions_1], [:controller_2, :actions_2]
+      Permissioner::Matchers::ExactlyExpectActions.should_receive(:new).with(:@filters, *expected_actions).and_call_original
+      matcher_helper.exactly_have_filters_for(*expected_actions).should be_kind_of(Permissioner::Matchers::ExactlyExpectActions)
     end
   end
 
