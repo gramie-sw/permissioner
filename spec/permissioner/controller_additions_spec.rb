@@ -33,7 +33,7 @@ describe Permissioner::ControllerAdditions do
 
     before :each do
       @params = {controller: 'comments', action: 'index'}
-      @controller.stub(:current_resource).and_return(:current_resource)
+      @controller.stub(:current_resource).and_return('resource')
       @controller.stub(:params).and_return(@params)
     end
 
@@ -44,12 +44,12 @@ describe Permissioner::ControllerAdditions do
     end
 
     it 'should call allow_action? with correct parameters' do
-      @controller.permission_service.should_receive(:allow_action?).with('comments', 'index', :current_resource, @params).and_return(true)
+      @controller.permission_service.should_receive(:allow_action?).with('comments', 'index', resource: 'resource', params: @params).and_return(true)
       @controller.authorize
     end
 
     it 'should raise Permissioner::NotAuthorized when action not allowed' do
-      @controller.permission_service.should_receive(:allow_action?).with('comments', 'index', :current_resource, @params).and_return(false)
+      @controller.permission_service.should_receive(:allow_action?).with('comments', 'index', resource: 'resource', params: @params).and_return(false)
       expect {
         @controller.authorize
       }.to raise_error Permissioner::NotAuthorized

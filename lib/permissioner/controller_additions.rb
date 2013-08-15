@@ -7,7 +7,7 @@ module Permissioner
     end
 
     def authorize
-      if permission_service.allow_action?(params[:controller], params[:action], current_resource, params)
+      if permission_service.allow_action?(params[:controller], params[:action], resource: current_resource, params: params)
         permission_service.permit_params!(params)
       else
         raise Permissioner::NotAuthorized

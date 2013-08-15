@@ -13,8 +13,8 @@ describe Permissioner::Matchers do
   describe '#allow_action' do
 
     it 'should delegate call to PermissionService#allow_action? and pass when is returns true' do
-      permission_service.should_receive(:allow_action?).with(:comments, :index).and_return(true)
-      permission_service.should allow_action :comments, :index
+      permission_service.should_receive(:allow_action?).with(:comments, :index, resource: 'resource', params: 'params').and_return(true)
+      permission_service.should allow_action :comments, :index, resource: 'resource', params: 'params'
     end
 
     it 'should fail when PermissionService#allow_action? returns false' do
@@ -39,8 +39,8 @@ describe Permissioner::Matchers do
   describe '#pass_filters' do
 
     it 'should delegate call to PermissionService#passed_filters? and pass when is returns true' do
-      permission_service.should_receive(:passed_filters?).with(:comment, :user_id, :current_resource, :params).and_return(true)
-      permission_service.should pass_filters :comment, :user_id, :current_resource, :params
+      permission_service.should_receive(:passed_filters?).with(:comment, :user_id, resource: 'resource', params: 'params').and_return(true)
+      permission_service.should pass_filters :comment, :user_id, resource: 'resource', params: 'params'
     end
 
     it 'should fail when PermissionService#passed_filters? returns false' do
