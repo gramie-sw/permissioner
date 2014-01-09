@@ -172,22 +172,37 @@ describe Permissioner::ServiceAdditions do
 
   describe '#permit_params!' do
 
-    it 'should call permit! on given params when @allow_all is true' do
-      params = double('params')
-      params.should_receive(:permit!)
-      permission_service.allow_all
-      permission_service.permit_params!(params)
+    context 'if @allow_all is true' do
+
+      it 'should call permit! on given params when @allow_all is true' do
+        params = double('params')
+        params.should_receive(:permit!)
+        permission_service.allow_all
+        permission_service.permit_params!(params)
+      end
     end
 
-    it 'should call permit on allowed params' do
-      params = {comment: {user_id: '12', text: 'text', date: 'date'}, post: {title: 'title', content: 'content'}}
-      permission_service.allow_attributes(:comment, [:user_id, :text])
-      permission_service.allow_attributes(:post, [:title, :content])
-      params[:comment].should_receive(:respond_to?).with(:permit).and_return(true)
-      params[:comment].should_receive(:permit).with(:user_id, :text)
-      params[:post].should_receive(:permit).with(:title, :content)
-      permission_service.permit_params!(params)
+    context 'if @allow_all is false' do
+
+      it 'should permit allow params' do
+        permission_service.allow_attributes(:comment, [:user_id, :text])
+        permission_service.allow_attributes(:post, [:title, :content])
+
+        params = ActionController::Parameters.new({
+                                                      comment: {user_id: '12', text: 'text', date: 'date'},
+                                                      post: {title: 'title', content: 'content'}
+                                                  })
+
+        permission_service.permit_params!(params)
+
+        params[:comment].should be_permitted
+        params[:comment].should include :user_id, :text
+        params[:comment].should_not include :date
+        params[:post].should be_permitted
+        params[:post].should include :title, :content
+      end
     end
+
   end
 
   describe '#allow_all' do

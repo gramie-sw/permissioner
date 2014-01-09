@@ -36,7 +36,7 @@ module Permissioner
       elsif @allowed_attributes
         @allowed_attributes.each do |resource, attributes|
           if params[resource].respond_to? :permit
-            params[resource] = params[resource].permit(*attributes)
+            params[resource] = params.permit(resource => attributes)[resource]
           end
         end
       end
