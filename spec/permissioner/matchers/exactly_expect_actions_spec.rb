@@ -18,9 +18,9 @@ describe Permissioner::Matchers::ExactlyExpectActions do
 
     it 'should transform expected_actions into string array' do
       matcher = create_matcher [:controller, :action]
-      matcher.instance_variable_get(:@all_expected_actions).should eq [['controller', ['action']]]
+      expect(matcher.instance_variable_get(:@all_expected_actions)).to eq [['controller', ['action']]]
       matcher = create_matcher [:controller, [:action_1, :action_2]]
-      matcher.instance_variable_get(:@all_expected_actions).should eq [['controller', ['action_1', 'action_2']]]
+      expect(matcher.instance_variable_get(:@all_expected_actions)).to eq [['controller', ['action_1', 'action_2']]]
     end
 
     it 'should raise an exception if multiple actions not stated as array' do
@@ -40,7 +40,7 @@ describe Permissioner::Matchers::ExactlyExpectActions do
             [:users, [:show, :new, :create]],
             [:posts, [:show, :edit, :update]]
         )
-        matcher.matches?(permission_service).should be_true
+        expect(matcher.matches?(permission_service)).to be_truthy
       end
 
       it 'should return true if for a given controller all actions are allowed and all is expected' do
@@ -50,7 +50,7 @@ describe Permissioner::Matchers::ExactlyExpectActions do
             [:users, [:show, :new, :create]],
             [:posts, [:show, :edit, :update]]
         )
-        matcher.matches?(permission_service).should be_true
+        expect(matcher.matches?(permission_service)).to be_truthy
       end
     end
 
@@ -62,7 +62,7 @@ describe Permissioner::Matchers::ExactlyExpectActions do
             [:users, [:show, :new, :create]],
             [:accounts, [:show, :edit, :update]]
         )
-        matcher.matches?(permission_service).should be_false
+        expect(matcher.matches?(permission_service)).to be_falsey
       end
 
       it 'should return false if at least one controller is allowed but no expected' do
@@ -70,7 +70,7 @@ describe Permissioner::Matchers::ExactlyExpectActions do
             [:comments, [:index, :show, :new, :create]],
             [:users, [:show, :new, :create]]
         )
-        matcher.matches?(permission_service).should be_false
+        expect(matcher.matches?(permission_service)).to be_falsey
       end
     end
 
@@ -82,7 +82,7 @@ describe Permissioner::Matchers::ExactlyExpectActions do
             [:users, [:show, :new, :create]],
             [:posts, [:show, :edit, :update]]
         )
-        matcher.matches?(permission_service).should be_false
+        expect(matcher.matches?(permission_service)).to be_falsey
       end
 
       it 'should return false if at least one action is not allowed but no expected' do
@@ -91,7 +91,7 @@ describe Permissioner::Matchers::ExactlyExpectActions do
             [:users, [:show, :new, :create]],
             [:posts, [:show, :edit, :update]]
         )
-        matcher.matches?(permission_service).should be_false
+        expect(matcher.matches?(permission_service)).to be_falsey
       end
     end
 
@@ -101,11 +101,11 @@ describe Permissioner::Matchers::ExactlyExpectActions do
           [:users, [:show, :new, :create]],
           [:posts, [:show, :edit, :update]]
       )
-      matcher.matches?(PermissionService.new).should be_false
+      expect(matcher.matches?(PermissionService.new)).to be_falsey
     end
   end
 
-  describe '#failure_message_for_should' do
+  describe '#failure_message' do
 
     context 'if controllers did not match' do
 
@@ -120,7 +120,7 @@ describe Permissioner::Matchers::ExactlyExpectActions do
           "[\"comments\", \"posts\", \"users\"]"
         #call is necessary because matches sets @permission_service
         matcher.matches?(permission_service)
-        matcher.failure_message_for_should.should eq expected_messages
+        expect(matcher.failure_message).to eq expected_messages
       end
 
       it 'should work if no controller allowed' do
@@ -130,7 +130,7 @@ describe Permissioner::Matchers::ExactlyExpectActions do
         )
         #call is necessary because matches sets @permission_service
         matcher.matches?(PermissionService.new)
-        matcher.failure_message_for_should.should be_kind_of(String)
+        expect(matcher.failure_message).to be_kind_of(String)
       end
     end
 
@@ -152,7 +152,7 @@ describe Permissioner::Matchers::ExactlyExpectActions do
             "[\"create\", \"new\", \"show\"]\n"
         #call is necessary because matches sets @permission_service
         matcher.matches?(permission_service)
-        matcher.failure_message_for_should.should eq expected_messages
+        expect(matcher.failure_message).to eq expected_messages
       end
 
 
@@ -164,24 +164,24 @@ describe Permissioner::Matchers::ExactlyExpectActions do
         )
         #call is necessary because matches sets @permission_service
         matcher.matches?(PermissionService.new)
-        matcher.failure_message_for_should.should be_kind_of(String)
+        expect(matcher.failure_message).to be_kind_of(String)
       end
     end
   end
 
 
-  describe '#failure_message_for_should_not' do
+  describe '# failure_message_when_negated' do
 
     it 'should be available' do
       matcher = create_matcher
       expected_messages = 'given actions are exactly match although this is not expected'
-      matcher.failure_message_for_should_not.should eq expected_messages
+      expect(matcher. failure_message_when_negated).to eq expected_messages
     end
 
     it 'should be available' do
       matcher = create_matcher
       matcher.matches?(PermissionService.new)
-      matcher.failure_message_for_should_not.should be_kind_of(String)
+      expect(matcher. failure_message_when_negated).to be_kind_of(String)
     end
   end
 

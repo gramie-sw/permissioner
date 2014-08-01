@@ -16,7 +16,7 @@ module Permissioner
         expected_actions_exactly_match?
       end
 
-      def failure_message_for_should
+      def failure_message
         if @failing_actions.empty?
           "expected to find actions for controllers \n" \
           "#{all_expected_controllers}, but found actions for controllers\n"\
@@ -33,7 +33,7 @@ module Permissioner
         end
       end
 
-      def failure_message_for_should_not
+      def  failure_message_when_negated
         'given actions are exactly match although this is not expected'
       end
 

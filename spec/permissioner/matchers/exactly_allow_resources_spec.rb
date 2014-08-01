@@ -19,26 +19,26 @@ describe Permissioner::Matchers::ExactlyAllowResources do
 
     it 'should return true if given resources exaclty allowed' do
       matcher = create_matcher :user, :comment, :post
-      matcher.matches?(permission_service).should be_true
+      expect(matcher.matches?(permission_service)).to be_truthy
     end
 
     it 'should return false if at least one resource is not allowed' do
       matcher = create_matcher :user, :comment, :account
-      matcher.matches?(permission_service).should be_false
+      expect(matcher.matches?(permission_service)).to be_falsey
     end
 
     it 'should return false if more resources allowed than expected' do
       matcher = create_matcher :user, :comment
-      matcher.matches?(permission_service).should be_false
+      expect(matcher.matches?(permission_service)).to be_falsey
     end
 
     it 'should work if no resource is allowed' do
       matcher = create_matcher :user, :comment
-      matcher.matches?(PermissionService.new).should be_false
+      expect(matcher.matches?(PermissionService.new)).to be_falsey
     end
   end
 
-  describe '#failure_message_for_should' do
+  describe '#failure_message' do
 
     it 'should be available' do
       matcher = create_matcher(:user, :comment)
@@ -48,30 +48,30 @@ describe Permissioner::Matchers::ExactlyAllowResources do
           "[:comment, :post, :user] allowed"
       #call is necessary because matches sets @permission_service
       matcher.matches?(permission_service)
-      matcher.failure_message_for_should.should eq expected_messages
+      expect(matcher.failure_message).to eq expected_messages
     end
 
     it 'should work if no controller allowed' do
       matcher = create_matcher(:user, :comment)
       #call is necessary because matches sets @permission_service
       matcher.matches?((PermissionService.new))
-      matcher.failure_message_for_should.should be_kind_of(String)
+      expect(matcher.failure_message).to be_kind_of(String)
     end
   end
 
-  describe '#failure_message_for_should_not' do
+  describe '# failure_message_when_negated' do
 
     it 'should be available' do
       matcher = create_matcher(:user, :comment)
       expected_messages =
           "expected to exactly not allow resources \n" \
           "[:comment, :user], but these resources are exactly allowed\n"
-      matcher.failure_message_for_should_not.should eq expected_messages
+      expect(matcher. failure_message_when_negated).to eq expected_messages
     end
 
     it 'should work if no controller allowed' do
       matcher = create_matcher(:comment, :user)
-      matcher.failure_message_for_should_not.should be_kind_of(String)
+      expect(matcher. failure_message_when_negated).to be_kind_of(String)
     end
   end
 

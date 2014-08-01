@@ -18,9 +18,9 @@ describe Permissioner::Matchers::ExactlyAllowAttributes do
 
     it 'should ensure that all attributes are into an array' do
       matcher = create_matcher [:resource, :attribute]
-      matcher.instance_variable_get(:@all_expected_attributes).should eq [[:resource, [:attribute]]]
+      expect(matcher.instance_variable_get(:@all_expected_attributes)).to eq [[:resource, [:attribute]]]
       matcher = create_matcher [:resource, [:attribute_1, :attribute_2]]
-      matcher.instance_variable_get(:@all_expected_attributes).should eq [[:resource, [:attribute_1, :attribute_2]]]
+      expect(matcher.instance_variable_get(:@all_expected_attributes)).to eq [[:resource, [:attribute_1, :attribute_2]]]
     end
 
     it 'should raise an exception if multiple actions not stated as array' do
@@ -40,7 +40,7 @@ describe Permissioner::Matchers::ExactlyAllowAttributes do
             [:comment, [:user_id, :post_id, :content]],
             [:post, [:user_id, :content]]
         )
-        matcher.matches?(permission_service).should be_true
+        expect(matcher.matches?(permission_service)).to be_truthy
       end
 
       it 'should accept attributs being a hash' do
@@ -60,7 +60,7 @@ describe Permissioner::Matchers::ExactlyAllowAttributes do
              ]
             ]
         )
-        matcher.matches?(permission_service).should be_true
+        expect(matcher.matches?(permission_service)).to be_truthy
       end
     end
 
@@ -72,7 +72,7 @@ describe Permissioner::Matchers::ExactlyAllowAttributes do
             [:comment, [:user_id, :post_id, :content]],
             [:account, [:user_id, :content]]
         )
-        matcher.matches?(permission_service).should be_false
+        expect(matcher.matches?(permission_service)).to be_falsey
       end
 
       it 'should return false if at least one resource is allowed but no expected' do
@@ -80,7 +80,7 @@ describe Permissioner::Matchers::ExactlyAllowAttributes do
             [:user, [:name, :email, :phone]],
             [:comment, [:user_id, :post_id, :content]]
         )
-        matcher.matches?(permission_service).should be_false
+        expect(matcher.matches?(permission_service)).to be_falsey
       end
     end
 
@@ -92,7 +92,7 @@ describe Permissioner::Matchers::ExactlyAllowAttributes do
             [:comment, [:user_id, :post_id, :content]],
             [:post, [:user_id, :content]]
         )
-        matcher.matches?(permission_service).should be_false
+        expect(matcher.matches?(permission_service)).to be_falsey
       end
 
       it 'should return false if at least one attribute is allowed but not expected' do
@@ -101,27 +101,27 @@ describe Permissioner::Matchers::ExactlyAllowAttributes do
             [:comment, [:user_id, :post_id, :content]],
             [:post, [:user_id, :content]]
         )
-        matcher.matches?(permission_service).should be_false
+        expect(matcher.matches?(permission_service)).to be_falsey
       end
     end
   end
 
-  describe '#failure_message_for_should_not' do
+  describe '# failure_message_when_negated' do
 
     it 'should be available' do
       matcher = create_matcher
       expected_messages = 'given attributes are exactly allowed although this is not expected'
-      matcher.failure_message_for_should_not.should eq expected_messages
+      expect(matcher. failure_message_when_negated).to eq expected_messages
     end
 
     it 'should be available' do
       matcher = create_matcher
       matcher.matches?(PermissionService.new)
-      matcher.failure_message_for_should_not.should be_kind_of(String)
+      expect(matcher. failure_message_when_negated).to be_kind_of(String)
     end
   end
 
-  describe '#failure_message_for_should' do
+  describe '#failure_message' do
 
     context 'if resources did not match' do
 
@@ -136,7 +136,7 @@ describe Permissioner::Matchers::ExactlyAllowAttributes do
             "[:comment, :post, :user]"
         #call is necessary because matches sets @permission_service
         matcher.matches?(permission_service)
-        matcher.failure_message_for_should.should eq expected_messages
+        expect(matcher.failure_message).to eq expected_messages
       end
 
       it 'should work if no controller allowed' do
@@ -147,7 +147,7 @@ describe Permissioner::Matchers::ExactlyAllowAttributes do
         )
         #call is necessary because matches sets @permission_service
         matcher.matches?(PermissionService.new)
-        matcher.failure_message_for_should.should be_kind_of(String)
+        expect(matcher.failure_message).to be_kind_of(String)
       end
     end
 
@@ -170,7 +170,7 @@ describe Permissioner::Matchers::ExactlyAllowAttributes do
             "[:user_id, :post_id, :content] are allowed\n"
         #call is necessary because matches sets @permission_service
         matcher.matches?(permission_service)
-        matcher.failure_message_for_should.should eq expected_messages
+        expect(matcher.failure_message).to eq expected_messages
       end
 
 
@@ -182,12 +182,12 @@ describe Permissioner::Matchers::ExactlyAllowAttributes do
         )
         #call is necessary because matches sets @permission_service
         matcher.matches?(PermissionService.new)
-        matcher.failure_message_for_should.should be_kind_of(String)
+        expect(matcher.failure_message).to be_kind_of(String)
       end
     end
   end
 
-  #describe '#failure_message_for_should' do
+  #describe '#failure_message' do
   #
   #  it 'should be available' do
   #    matcher = create_matcher :user, [:name, :email, :street]
@@ -196,17 +196,17 @@ describe Permissioner::Matchers::ExactlyAllowAttributes do
   #        "[:name, :email, :street] are exactly allowed, but found attributes\n"\
   #        "[:name, :email, :phone] allowed"
   #    matcher.matches?(permission_service)
-  #    matcher.failure_message_for_should.should eq expected_messages
+  #    matcher.failure_message.should eq expected_messages
   #  end
   #
   #  it 'should work if no controller allowed' do
   #    matcher = create_matcher :user, [:name, :email, :street]
   #    matcher.matches?(PermissionService.new)
-  #    matcher.failure_message_for_should.should be_kind_of(String)
+  #    matcher.failure_message.should be_kind_of(String)
   #  end
   #end
   #
-  #describe '#failure_message_for_should_not' do
+  #describe '# failure_message_when_negated' do
   #
   #  it 'should be available' do
   #    matcher = create_matcher :user, [:name, :email, :street]
@@ -215,13 +215,13 @@ describe Permissioner::Matchers::ExactlyAllowAttributes do
   #        "[:name, :email, :street] are exactly not allowed,\n"\
   #        "but those attributes are exactly allowed\n"
   #    matcher.matches?(permission_service)
-  #    matcher.failure_message_for_should_not.should eq expected_messages
+  #    matcher. failure_message_when_negated.should eq expected_messages
   #  end
   #
   #  it 'should work if no controller allowed' do
   #    matcher = create_matcher :user, [:name, :email, :street]
   #    matcher.matches?(PermissionService.new)
-  #    matcher.failure_message_for_should_not.should be_kind_of(String)
+  #    matcher. failure_message_when_negated.should be_kind_of(String)
   #  end
   #end
 end

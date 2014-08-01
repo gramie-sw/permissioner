@@ -15,7 +15,7 @@ module Permissioner
         expected_attributes_exactly_match?
       end
 
-      def failure_message_for_should
+      def failure_message
         if @failing_attributes.empty?
           "expected to find allowed attributes for resources\n" \
           "#{all_expected_resources}, but found allowed attributes for resources\n"\
@@ -32,7 +32,7 @@ module Permissioner
         end
       end
 
-      def failure_message_for_should_not
+      def failure_message_when_negated
         'given attributes are exactly allowed although this is not expected'
       end
 
@@ -103,13 +103,13 @@ module Permissioner
       #  expected_attributs_exactly_macht? allowed_attributes_for_resource
       #end
       #
-      #def failure_message_for_should
+      #def failure_message
       #  "expected that for resource \"#{@resource}\" attributes\n"\
       #  "#{@expected_attributes} are exactly allowed, but found attributes\n"\
       #  "#{allowed_attributes_for_resource} allowed"
       #end
       #
-      #def failure_message_for_should_not
+      #def  failure_message_when_negated
       #  "expected that for resource \"#{@resource}\" attributes\n"\
       #  "#{@expected_attributes} are exactly not allowed,\n"\
       #  "but those attributes are exactly allowed\n"

@@ -11,13 +11,13 @@ module Permissioner
         resources_exactly_match?
       end
 
-      def failure_message_for_should
+      def failure_message
         "expected to exactly allow resources \n" \
         "#{@expected_resources.sort}, but found resources\n"\
         "#{allowed_resources.sort} allowed"
       end
 
-      def failure_message_for_should_not
+      def  failure_message_when_negated
         "expected to exactly not allow resources \n" \
         "#{@expected_resources.sort}, but these resources are exactly allowed\n"\
       end

@@ -11,13 +11,13 @@ module Permissioner
         controllers_exactly_match?(allowed_controllers)
       end
 
-      def failure_message_for_should
+      def failure_message
         "expected to exactly allow controllers \n" \
           "#{@expected_controllers.sort}, but found controllers\n"\
           "#{allowed_controllers.sort} allowed"
       end
 
-      def failure_message_for_should_not
+      def  failure_message_when_negated
         "expected to exactly not allow controllers \n" \
           "#{@expected_controllers.sort}, but these controllers are exactly allowed\n"\
       end

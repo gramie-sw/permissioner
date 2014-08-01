@@ -4,10 +4,10 @@ describe Permissioner::ControllerAdditions do
 
   let(:controller) do
     controller_class = Class.new
-    controller_class.stub(:helper_method)
+    allow(controller_class).to receive(:helper_method)
     controller_class.send(:include, Permissioner::ControllerAdditions)
     controller = controller_class.new
-    controller.stub(:current_user)
+    allow(controller).to receive(:current_user)
     controller
   end
 
@@ -16,13 +16,13 @@ describe Permissioner::ControllerAdditions do
     let(:clazz) { Class.new }
 
     it 'should set view helpers' do
-      clazz.should_receive(:helper_method).with(:allow_action?, :allow_attribute?, :permission_service)
+      expect(clazz).to receive(:helper_method).with(:allow_action?, :allow_attribute?, :permission_service)
       clazz.send(:include, Permissioner::ControllerAdditions)
     end
 
     it 'should delegate helper methods to permission servie' do
-      clazz.stub(:helper_method)
-      clazz.should_receive(:delegate).with(:allow_action?, :allow_attribute?, to: :permission_service)
+      allow(clazz).to receive(:helper_method)
+      expect(clazz).to receive(:delegate).with(:allow_action?, :allow_attribute?, to: :permission_service)
       clazz.send(:include, Permissioner::ControllerAdditions)
     end
   end
@@ -32,23 +32,23 @@ describe Permissioner::ControllerAdditions do
     let(:params) { {controller: 'comments', action: 'index'} }
 
     before :each do
-      controller.stub(:current_resource).and_return('resource')
-      controller.stub(:params).and_return(params)
+      allow(controller).to receive(:current_resource).and_return('resource')
+      allow(controller).to receive(:params).and_return(params)
     end
 
     it 'should call permit_params! if action allwed and filters passed' do
-      controller.permission_service.should_receive(:allow_action?).and_return(true)
-      controller.permission_service.should_receive(:permit_params!).with(params)
+      expect(controller.permission_service).to receive(:allow_action?).and_return(true)
+      expect(controller.permission_service).to receive(:permit_params!).with(params)
       controller.authorize
     end
 
     it 'should call allow_action? with correct parameters' do
-      controller.permission_service.should_receive(:allow_action?).with('comments', 'index', resource: 'resource', params: params).and_return(true)
+      expect(controller.permission_service).to receive(:allow_action?).with('comments', 'index', resource: 'resource', params: params).and_return(true)
       controller.authorize
     end
 
     it 'should raise Permissioner::NotAuthorized when action not allowed' do
-      controller.permission_service.should_receive(:allow_action?).with('comments', 'index', resource: 'resource', params: params).and_return(false)
+      expect(controller.permission_service).to receive(:allow_action?).with('comments', 'index', resource: 'resource', params: params).and_return(false)
       expect {
         controller.authorize
       }.to raise_error Permissioner::NotAuthorized
@@ -58,21 +58,21 @@ describe Permissioner::ControllerAdditions do
   describe '#permission_service' do
 
     it 'should return instance of PermissionService' do
-      controller.permission_service.class.should eq PermissionService
+      expect(controller.permission_service.class).to eq PermissionService
     end
 
     it 'should cache PermissionService instance' do
-      controller.permission_service.should be controller.permission_service
+      expect(controller.permission_service).to be controller.permission_service
     end
 
     it 'should create PermissionService by calling PermissionService::new' do
-      PermissionService.should_receive(:new)
+      expect(PermissionService).to receive(:new)
       controller.permission_service
     end
 
     it 'should pass current_user to PermissionService::initialize' do
-      controller.should_receive(:current_user).and_return('current_user')
-      PermissionService.should_receive(:new).with('current_user')
+      expect(controller).to receive(:current_user).and_return('current_user')
+      expect(PermissionService).to receive(:new).with('current_user')
       controller.permission_service
     end
   end
@@ -80,7 +80,7 @@ describe Permissioner::ControllerAdditions do
   describe '#current_resource' do
 
     it 'should return nil as default' do
-      controller.current_resource.should be_nil
+      expect(controller.current_resource).to be_nil
     end
   end
 end

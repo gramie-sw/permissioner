@@ -19,7 +19,7 @@ describe Permissioner::Matchers::ExactlyAllowControllers do
 
     it 'should transform expected_controllers to strings' do
       matcher = create_matcher(:comments, :users)
-      matcher.instance_variable_get(:@expected_controllers).should eq ['comments', 'users']
+      expect(matcher.instance_variable_get(:@expected_controllers)).to eq ['comments', 'users']
     end
   end
 
@@ -27,26 +27,26 @@ describe Permissioner::Matchers::ExactlyAllowControllers do
 
     it 'should return true if exactly all expected controllers allowed' do
       matcher = create_matcher(:comments, :users, :posts)
-      matcher.matches?(permission_service).should be_true
+      expect(matcher.matches?(permission_service)).to be_truthy
     end
 
     it 'should return false if at least one controller is not allowed' do
       matcher = create_matcher(:comments, :users, :posts, :blogs)
-      matcher.matches?(permission_service).should be_false
+      expect(matcher.matches?(permission_service)).to be_falsey
     end
 
     it 'should return true if more controllers allowed than expected' do
       matcher = create_matcher(:comments, :users)
-      matcher.matches?(permission_service).should be_false
+      expect(matcher.matches?(permission_service)).to be_falsey
     end
 
     it 'should work if no controller allowed' do
       matcher = create_matcher(:comments, :users)
-      matcher.matches?(PermissionService.new).should be_false
+      expect(matcher.matches?(PermissionService.new)).to be_falsey
     end
   end
 
-  describe '#failure_message_for_should' do
+  describe '#failure_message' do
 
     it 'should be available' do
       matcher = create_matcher(:comments)
@@ -56,30 +56,30 @@ describe Permissioner::Matchers::ExactlyAllowControllers do
           "[\"comments\", \"posts\", \"users\"] allowed"
       #call is necessary because matches sets @permission_service
       matcher.matches?(permission_service)
-      matcher.failure_message_for_should.should eq expected_messages
+      expect(matcher.failure_message).to eq expected_messages
     end
 
     it 'should work if no controller allowed' do
       matcher = create_matcher(:comments)
       #call is necessary because matches sets @permission_service
       matcher.matches?((PermissionService.new))
-      matcher.failure_message_for_should.should be_kind_of(String)
+      expect(matcher.failure_message).to be_kind_of(String)
     end
   end
 
-  describe '#failure_message_for_should_not' do
+  describe '# failure_message_when_negated' do
 
     it 'should be available' do
       matcher = create_matcher(:users, :comments)
       expected_messages =
           "expected to exactly not allow controllers \n" \
           "[\"comments\", \"users\"], but these controllers are exactly allowed\n"
-      matcher.failure_message_for_should_not.should eq expected_messages
+      expect(matcher. failure_message_when_negated).to eq expected_messages
     end
 
     it 'should work if no controller allowed' do
       matcher = create_matcher(:comments, :users)
-      matcher.failure_message_for_should_not.should be_kind_of(String)
+      expect(matcher. failure_message_when_negated).to be_kind_of(String)
     end
   end
 
