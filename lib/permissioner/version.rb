@@ -1,3 +1,3 @@
 module Permissioner
-  VERSION = "0.2.0.beta"
+  VERSION = "1.0.0.beta"
 end
